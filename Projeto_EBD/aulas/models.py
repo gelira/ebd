@@ -52,7 +52,7 @@ class Aula(models.Model):
     # data = models.DateTimeField() # VALOR PADRÃO DA DATA DE HOJE
 
     def __str__(self):
-        return self.nome
+        return self.aula
 
 class Professor(models.Model):
     id = models.AutoField(primary_key=True)
@@ -60,7 +60,7 @@ class Professor(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.nome
+        return self.usuario
 
 class Diario(models.Model):
     id = models.AutoField(primary_key=True)
@@ -77,7 +77,7 @@ class Diario(models.Model):
     dizimos = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.nome
+        return self.aula
 
 class Aluno(models.Model):
     id = models.AutoField(primary_key=True)
@@ -97,7 +97,7 @@ class Presenca(models.Model):
     presenca = models.CharField(max_length=8) #PRESENTE / AUSENTE
 
     def __str__(self):
-        return self.nome
+        return self.selecione_aluno
 
 class Matricula(models.Model):
     id = models.AutoField(primary_key=True)
@@ -106,4 +106,4 @@ class Matricula(models.Model):
     classe = models.ForeignKey(Classe, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.nome
+        return self.selecione_aluno
