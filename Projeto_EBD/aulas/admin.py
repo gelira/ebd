@@ -5,10 +5,10 @@ class ProfessorAdm(admin.ModelAdmin):
     list_display = ["usuario", "classe"]
 
 class TrimestreDisplay(admin.ModelAdmin):
-    list_display = ["nome_igreja", "trimestre", "ano", "concluido"]
+    list_display = ["igreja", "trimestre", "ano", "concluido"]
 
 class MatriculaDisplay(admin.ModelAdmin):
-    list_display = ["selecione_aluno", "trimestre", "classe"]
+    list_display = ["aluno", "trimestre", "classe"]
 
 class UsuarioDisplay(admin.ModelAdmin):
     list_display = ["nome", "email", "role"]
@@ -18,7 +18,7 @@ class DiarioDisplay(admin.ModelAdmin):
 
 ## NÃO NECESSÁRIO
 class ClasseDisplay(admin.ModelAdmin):
-    list_display = ["nome_igreja", "nome"]
+    list_display = ["igreja", "nome"]
 
 admin.site.register(Igreja)
 admin.site.register(Usuario, UsuarioDisplay)
