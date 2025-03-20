@@ -37,8 +37,16 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
     'aulas',
 ]
+'''
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+'''
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -108,6 +116,8 @@ LANGUAGE_CODE = "pt-Br"
 
 TIME_ZONE = "UTC"
 
+DEFAULT_CHARSET = 'utf-8'
+
 USE_I18N = True
 
 USE_TZ = True
@@ -123,4 +133,10 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", ]
+
+SESSION_COOKIE_AGE = 60 * 60  # 1 hora, ou ajuste conforme necessário
+CSRF_COOKIE_AGE = 60 * 60  # 1 hora, ou ajuste conforme necessário
+CSRF_COOKIE_SECURE = True  # Se você estiver em produção e usando HTTPS
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Caso queira usar banco de dados para sessão
+
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'special-space-guacamole-j7ppw595xgq2757-8000.app.github.dev']
