@@ -4,6 +4,13 @@ from utils.models import BaseModel
 class Igreja(BaseModel):
     nome = models.CharField(max_length=200)
 
+class Usuario(BaseModel):
+    igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
+    nome = models.CharField(max_length=200)
+    email = models.EmailField()
+    role = models.CharField(max_length=50)
+    entity_id = models.BigIntegerField(null=True)
+
 class Congregacao(BaseModel):
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
     nome = models.CharField(max_length=200)
