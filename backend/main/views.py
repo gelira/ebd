@@ -5,10 +5,9 @@ from . import models, serializers
 
 class AlunoViewSet(ViewSet):
     def list(self, request):
-        qs = models.Aluno.objects.filter(igreja_id=1) # MOCKED
-        
         nome = request.query_params.get('nome')
 
+        qs = models.Aluno.objects.filter(igreja_id=1) # MOCKED
         if nome:
             qs = qs.filter(nome__icontains=nome)
 
