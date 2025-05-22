@@ -28,7 +28,7 @@ class Periodo(BaseModel):
 class Aluno(BaseModel):
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
     nome = models.TextField()
-    data_nascimento = models.DateField()
+    data_nascimento = models.DateField(null=True)
 
 class Aula(BaseModel):
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT)
