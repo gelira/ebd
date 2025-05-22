@@ -5,8 +5,8 @@ from . import models
 class AlunoSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         aluno = models.Aluno()
-        aluno.nome = validated_data['nome']
-        aluno.data_nascimento = validated_data['data_nascimento']
+        aluno.nome = validated_data.get('nome')
+        aluno.data_nascimento = validated_data.get('data_nascimento')
         aluno.igreja_id = 1 # MOCKED
 
         aluno.save()
