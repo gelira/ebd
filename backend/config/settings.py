@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from datetime import timedelta
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -147,3 +148,10 @@ EMAIL_USE_SSL = True
 EMAIL_TIMEOUT = 5
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
+    'USER_ID_FIELD': 'uid',
+    'USER_ID_CLAIM': 'uid',
+    'AUTH_HEADER_TYPES': ['JWT']
+}
