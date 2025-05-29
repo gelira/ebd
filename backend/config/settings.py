@@ -149,9 +149,19 @@ EMAIL_TIMEOUT = 5
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'main.authentication.CustomJWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'main.permissions.IsAuthenticatedPermission',
+    ],
+}
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
     'USER_ID_FIELD': 'uid',
     'USER_ID_CLAIM': 'uid',
-    'AUTH_HEADER_TYPES': ['JWT']
+    'AUTH_HEADER_TYPES': ['JWT'],
+    'CHECK_USER_IS_ACTIVE': False
 }

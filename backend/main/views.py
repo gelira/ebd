@@ -6,6 +6,9 @@ from rest_framework.decorators import action
 from . import models, serializers
 
 class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
+    authentication_classes = []
+    permission_classes = []
+
     def get_serializer_class(self):
         if self.action == 'verify':
             return serializers.AuthCodeVerifySerializer
