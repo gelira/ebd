@@ -6,6 +6,7 @@ from main import views
 
 router = SimpleRouter(trailing_slash=False)
 router.register(r'alunos', views.AlunoViewSet, basename='alunos')
+router.register(r'auth-code', views.AuthCodeViewSet, basename='auth-code')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

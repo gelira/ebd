@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.tokens import AccessToken
 
-from . import models, email
+from . import models, email, exceptions
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
@@ -13,7 +13,7 @@ class LoginSerializer(serializers.Serializer):
         ).first()
 
         if not usuario:
-            raise AuthenticationFailed()
+            raise exceptions.InvalidCredentialsException()
 
         self.instance = models.AuthCode.generate(usuario)
 
@@ -22,6 +22,23 @@ class LoginSerializer(serializers.Serializer):
             usuario.email,
             f'Seu código de autenticação: {self.instance.code}'
         )
+
+        return self.instance
+
+class AuthCodeVerifySerializer(serializers.Serializer):
+    auth_code_uid = serializers.UUIDField(write_only=True)
+    code = serializers.CharField(max_length=6, write_only=True)
+    token = serializers.CharField(read_only=True)
+    
+    def save(self):
+        usuario = models.AuthCode.verify(
+            self.validated_data['auth_code_uid'],
+            self.validated_data['code']
+        )
+
+        token = AccessToken.for_user(usuario)
+
+        self.instance = { 'token': str(token) }
 
         return self.instance
 

@@ -39,7 +39,7 @@ class AuthCode(BaseModel):
         ).first()
 
         if not auth_code:
-            raise exceptions.InvalidAuthCodeException()
+            raise exceptions.InvalidCredentialsException()
 
         auth_code.is_active = False
         auth_code.save()
