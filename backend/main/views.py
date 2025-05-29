@@ -1,7 +1,12 @@
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, GenericViewSet
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 
 from . import models, serializers
+
+class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
+    def get_serializer_class(self):
+        return serializers.LoginSerializer
 
 class AlunoViewSet(ViewSet):
     def list(self, request):
