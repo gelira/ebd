@@ -16,7 +16,7 @@ class Usuario(BaseModel):
     entity_id = models.BigIntegerField(null=True)
 
 class AuthCode(BaseModel):
-    user = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    usuario = models.ForeignKey(Usuario, on_delete=models.PROTECT)
     code = models.CharField(max_length=6)
     is_active = models.BooleanField(default=True)
     expired_at = models.DateTimeField()
