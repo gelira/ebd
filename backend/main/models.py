@@ -1,5 +1,9 @@
 from django.db import models
+from django.utils import timezone
+from datetime import timedelta
 from utils.models import BaseModel
+from utils import generate_random_numeric_string
+from . import exceptions
 
 class Igreja(BaseModel):
     nome = models.CharField(max_length=200)
@@ -10,6 +14,37 @@ class Usuario(BaseModel):
     email = models.EmailField()
     role = models.CharField(max_length=50)
     entity_id = models.BigIntegerField(null=True)
+
+class AuthCode(BaseModel):
+    user = models.ForeignKey(Usuario, on_delete=models.PROTECT)
+    code = models.CharField(max_length=6)
+    is_active = models.BooleanField(default=True)
+    expired_at = models.DateTimeField()
+
+    @classmethod
+    def generate(cls, usuario):
+        return cls.objects.create(
+            usuario=usuario,
+            code=generate_random_numeric_string(),
+            expired_at=timezone.now() + timedelta(minutes=10)
+        )
+    
+    @classmethod
+    def verify(cls, uid, code):
+        auth_code = cls.objects.filter(
+            uid=uid,
+            code=code,
+            is_active=True,
+            expired_at__gt=timezone.now()
+        ).first()
+
+        if not auth_code:
+            raise exceptions.InvalidAuthCodeException()
+
+        auth_code.is_active = False
+        auth_code.save()
+
+        return auth_code.usuario
 
 class Congregacao(BaseModel):
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
