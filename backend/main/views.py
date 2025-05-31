@@ -1,7 +1,8 @@
-from rest_framework.viewsets import ViewSet, GenericViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 
 from . import models, serializers
 
@@ -25,19 +26,27 @@ class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     def verify(self, request):
         return self.create(request)
 
-class AlunoViewSet(ViewSet):
-    def list(self, request):
-        nome = request.query_params.get('nome')
+class AlunoViewSet(ModelViewSet):
+    serializer_class = serializers.AlunoSerializer
+    lookup_field = 'uid'
 
-        qs = models.Aluno.objects.filter(igreja_id=1) # MOCKED
-        if nome:
+    def get_queryset(self):
+        qs = models.Aluno.objects.filter(igreja_id=self.request.user.igreja_id)
+
+        nome = self.request.query_params.get('nome')
+        if self.action == 'list' and nome:
             qs = qs.filter(nome__icontains=nome)
 
-        return Response({ 'alunos': serializers.AlunoSerializer(qs, many=True).data })
+        return qs
+    
+    def perform_create(self, serializer):
+        serializer.save(igreja_id=self.request.user.igreja_id)
 
-    def create(self, request):
-        ser = serializers.AlunoSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        ser.save()
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
 
-        return Response(serializers.AlunoSerializer(ser.instance).data)
+        return Response({ 'alunos': response.data })
+    
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed('DELETE')
+

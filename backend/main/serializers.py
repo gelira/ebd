@@ -43,16 +43,6 @@ class AuthCodeVerifySerializer(serializers.Serializer):
         return self.instance
 
 class AlunoSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        aluno = models.Aluno()
-        aluno.nome = validated_data.get('nome')
-        aluno.data_nascimento = validated_data.get('data_nascimento')
-        aluno.igreja_id = 1 # MOCKED
-
-        aluno.save()
-
-        return aluno
-
     class Meta:
         model = models.Aluno
         fields = [
