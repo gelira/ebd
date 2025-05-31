@@ -50,3 +50,11 @@ class AlunoSerializer(serializers.ModelSerializer):
             'nome',
             'data_nascimento'
         ]
+
+class CongregacaoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Congregacao
+        fields = [
+            'uid',
+            'nome'
+        ]

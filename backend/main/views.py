@@ -37,7 +37,7 @@ class AlunoViewSet(ModelViewSet):
         if self.action == 'list' and nome:
             qs = qs.filter(nome__icontains=nome)
 
-        return qs
+        return qs.order_by('nome')
     
     def perform_create(self, serializer):
         serializer.save(igreja_id=self.request.user.igreja_id)
@@ -50,3 +50,22 @@ class AlunoViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         raise MethodNotAllowed('DELETE')
 
+class CongregacaoViewSet(ModelViewSet):
+    serializer_class = serializers.CongregacaoSerializer
+    lookup_field = 'uid'
+
+    def get_queryset(self):
+        return models.Congregacao.objects\
+            .filter(igreja_id=self.request.user.igreja_id)\
+                .order_by('nome')
+    
+    def perform_create(self, serializer):
+        serializer.save(igreja_id=self.request.user.igreja_id)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'congregacoes': response.data })
+    
+    def destroy(self, request, *args, **kwargs):
+        raise MethodNotAllowed('DELETE')
