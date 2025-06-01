@@ -7,6 +7,7 @@ from main import views
 router = SimpleRouter(trailing_slash=False)
 router.register(r'alunos', views.AlunoViewSet, basename='alunos')
 router.register(r'congregacoes', views.CongregacaoViewSet, basename='congregacoes')
+router.register(r'classes', views.ClasseViewSet, basename='classes')
 router.register(r'auth-code', views.AuthCodeViewSet, basename='auth-code')
 
 urlpatterns = [

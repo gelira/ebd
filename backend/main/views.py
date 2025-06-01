@@ -2,7 +2,6 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
 
 from . import models, serializers
 
@@ -46,9 +45,6 @@ class AlunoViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'alunos': response.data })
-    
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed('DELETE')
 
 class CongregacaoViewSet(ModelViewSet):
     serializer_class = serializers.CongregacaoSerializer
@@ -66,6 +62,21 @@ class CongregacaoViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'congregacoes': response.data })
+
+class ClasseViewSet(ModelViewSet):
+    lookup_field = 'uid'
+
+    def get_queryset(self):
+        return models.Classe.objects\
+            .filter(congregacao__igreja_id=self.request.user.igreja_id)\
+                .order_by('nome')
     
-    def destroy(self, request, *args, **kwargs):
-        raise MethodNotAllowed('DELETE')
+    def get_serializer_class(self):
+        if self.action in ['update', 'partial_update']:
+            return serializers.ClasseUpdateSerializer
+        return serializers.ClasseSerializer
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'classes': response.data })
