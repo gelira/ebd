@@ -80,3 +80,23 @@ class ClasseViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'classes': response.data })
+
+class PeriodoViewSet(ModelViewSet):
+    lookup_field = 'uid'
+    serializer_class = serializers.PeriodoSerializer
+
+    def get_queryset(self):
+        qs = models.Periodo.objects.filter(
+            congregacao__igreja_id=self.request.user.igreja_id
+        )
+
+        ano = self.request.query_params.get('ano')
+        if ano:
+            qs = qs.filter(ano=ano)
+
+        return qs.order_by('ano', 'periodo')
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'periodos': response.data })
