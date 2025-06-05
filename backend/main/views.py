@@ -47,7 +47,6 @@ class AlunoViewSet(ModelViewSet):
         return Response({ 'alunos': response.data })
 
 class CongregacaoViewSet(ModelViewSet):
-    serializer_class = serializers.CongregacaoSerializer
     lookup_field = 'uid'
 
     def get_queryset(self):
@@ -55,35 +54,57 @@ class CongregacaoViewSet(ModelViewSet):
             .filter(igreja_id=self.request.user.igreja_id)\
                 .order_by('nome')
     
+    def get_serializer_class(self):
+        if self.action == 'classes':
+            return serializers.ClasseSerializer
+
+        if self.action == 'periodos':
+            return serializers.PeriodoSerializer
+
+        return serializers.CongregacaoSerializer
+    
     def perform_create(self, serializer):
-        serializer.save(igreja_id=self.request.user.igreja_id)
+        kw = {}
+
+        if self.action in ['classes', 'periodos']:
+            kw['congregacao'] = self.get_object()
+
+        else:
+            kw['igreja_id'] = self.request.user.igreja_id
+
+        serializer.save(**kw)
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'congregacoes': response.data })
 
-    def get_classes(self):
+    @action(detail=True, methods=['get', 'post'])
+    def classes(self, request, uid=None):
+        if request.method.lower() == 'post':
+            return self.create(request)
+
         congregacao = self.get_object()
         ser = serializers.ClasseSerializer(congregacao.classe_set.order_by('nome'), many=True)
 
         return Response({ 'classes': ser.data })
     
-    def create_classe(self, request):
+    @action(detail=True, methods=['get', 'post'])
+    def periodos(self, request, uid=None):
+        if request.method.lower() == 'post':
+            return self.create(request)
+
         congregacao = self.get_object()
 
-        ser = serializers.ClasseSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-        ser.save(congregacao=congregacao)
+        qs = congregacao.periodo_set.all()
 
-        return Response(ser.data, status=201)
+        ano = self.request.query_params.get('ano')
+        if ano:
+            qs = qs.filter(ano=ano)
 
-    @action(detail=True, methods=['get', 'post'])
-    def classes(self, request, uid=None):
-        if request.method.lower() == 'get':
-            return self.get_classes()
+        ser = serializers.PeriodoSerializer(qs.order_by('periodo'), many=True)
 
-        return self.create_classe(request)
+        return Response({ 'periodos': ser.data })
 
 class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
@@ -94,22 +115,11 @@ class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
             congregacao__igreja_id=self.request.user.igreja_id
         )
 
-class PeriodoViewSet(ModelViewSet):
+class PeriodoViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
     serializer_class = serializers.PeriodoSerializer
 
     def get_queryset(self):
-        qs = models.Periodo.objects.filter(
+        return models.Periodo.objects.filter(
             congregacao__igreja_id=self.request.user.igreja_id
         )
-
-        ano = self.request.query_params.get('ano')
-        if ano:
-            qs = qs.filter(ano=ano)
-
-        return qs.order_by('ano', 'periodo')
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-
-        return Response({ 'periodos': response.data })

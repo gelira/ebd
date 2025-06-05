@@ -69,28 +69,14 @@ class ClasseSerializer(serializers.ModelSerializer):
         ]
 
 class PeriodoSerializer(serializers.ModelSerializer):
-    congregacao_uid = serializers.UUIDField(write_only=True)
-
-    def validate(self, attrs):
-        attrs['congregacao'] = get_object_or_404(
-            models.Congregacao,
-            igreja_id=self.context['request'].user.igreja_id,
-            uid=attrs['congregacao_uid']
-        )
-
-        return attrs
-    
-    def create(self, validated_data):
-        validated_data.pop('congregacao_uid')
-
-        return models.Periodo.objects.create(**validated_data)
-
     class Meta:
         model = models.Periodo
         fields = [
             'uid',
             'ano',
             'periodo',
-            'concluido',
-            'congregacao_uid'
+            'concluido'
+        ]
+        read_only_fields = [
+            'concluido'
         ]
