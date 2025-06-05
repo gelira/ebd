@@ -31,17 +31,15 @@ class AuthCodeVerifySerializer(serializers.Serializer):
     code = serializers.CharField(max_length=6, write_only=True)
     token = serializers.CharField(read_only=True)
     
-    def save(self):
+    def create(self, data):
         usuario = models.AuthCode.verify(
-            self.validated_data['auth_code_uid'],
-            self.validated_data['code']
+            data['auth_code_uid'],
+            data['code']
         )
 
         token = AccessToken.for_user(usuario)
 
-        self.instance = { 'token': str(token) }
-
-        return self.instance
+        return { 'token': str(token) }
 
 class AlunoSerializer(serializers.ModelSerializer):
     class Meta:
