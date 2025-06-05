@@ -68,14 +68,6 @@ class ClasseSerializer(serializers.ModelSerializer):
             'nome'
         ]
 
-class ClasseUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Classe
-        fields = [
-            'uid',
-            'nome'
-        ]
-
 class PeriodoSerializer(serializers.ModelSerializer):
     congregacao_uid = serializers.UUIDField(write_only=True)
 

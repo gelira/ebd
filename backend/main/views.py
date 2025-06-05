@@ -1,5 +1,5 @@
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -85,23 +85,14 @@ class CongregacaoViewSet(ModelViewSet):
 
         return self.create_classe(request)
 
-class ClasseViewSet(ModelViewSet):
+class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
+    serializer_class = serializers.ClasseSerializer
 
     def get_queryset(self):
-        return models.Classe.objects\
-            .filter(congregacao__igreja_id=self.request.user.igreja_id)\
-                .order_by('nome')
-    
-    def get_serializer_class(self):
-        if self.action in ['update', 'partial_update']:
-            return serializers.ClasseUpdateSerializer
-        return serializers.ClasseSerializer
-
-    def list(self, request, *args, **kwargs):
-        response = super().list(request, *args, **kwargs)
-
-        return Response({ 'classes': response.data })
+        return models.Classe.objects.filter(
+            congregacao__igreja_id=self.request.user.igreja_id
+        )
 
 class PeriodoViewSet(ModelViewSet):
     lookup_field = 'uid'
