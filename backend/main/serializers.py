@@ -61,28 +61,11 @@ class CongregacaoSerializer(serializers.ModelSerializer):
         ]
 
 class ClasseSerializer(serializers.ModelSerializer):
-    congregacao_uid = serializers.UUIDField(write_only=True)
-
-    def validate(self, attrs):
-        attrs['congregacao'] = get_object_or_404(
-            models.Congregacao,
-            igreja_id=self.context['request'].user.igreja_id,
-            uid=attrs['congregacao_uid']
-        )
-
-        return attrs
-    
-    def create(self, validated_data):
-        validated_data.pop('congregacao_uid')
-
-        return models.Classe.objects.create(**validated_data)
-
     class Meta:
         model = models.Classe
         fields = [
             'uid',
-            'nome',
-            'congregacao_uid'
+            'nome'
         ]
 
 class ClasseUpdateSerializer(serializers.ModelSerializer):

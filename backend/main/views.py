@@ -63,6 +63,28 @@ class CongregacaoViewSet(ModelViewSet):
 
         return Response({ 'congregacoes': response.data })
 
+    def get_classes(self):
+        congregacao = self.get_object()
+        ser = serializers.ClasseSerializer(congregacao.classe_set.order_by('nome'), many=True)
+
+        return Response({ 'classes': ser.data })
+    
+    def create_classe(self, request):
+        congregacao = self.get_object()
+
+        ser = serializers.ClasseSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save(congregacao=congregacao)
+
+        return Response(ser.data, status=201)
+
+    @action(detail=True, methods=['get', 'post'])
+    def classes(self, request, uid=None):
+        if request.method.lower() == 'get':
+            return self.get_classes()
+
+        return self.create_classe(request)
+
 class ClasseViewSet(ModelViewSet):
     lookup_field = 'uid'
 
