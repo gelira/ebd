@@ -78,3 +78,16 @@ class PeriodoSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'concluido'
         ]
+
+class AulaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Aula
+        fields = [
+            'uid',
+            'aula',
+            'data_prevista',
+            'concluida'
+        ]
+        read_only_fields = [
+            'concluida'
+        ]

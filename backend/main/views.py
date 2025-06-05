@@ -21,7 +21,7 @@ class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
 
         return response
 
-    @action(detail=False, methods=['post'], url_path='verify')
+    @action(detail=False, methods=['post'])
     def verify(self, request):
         return self.create(request)
 
@@ -80,17 +80,21 @@ class CongregacaoViewSet(ModelViewSet):
         return Response({ 'congregacoes': response.data })
 
     @action(detail=True, methods=['get', 'post'])
-    def classes(self, request, uid=None):
+    def classes(self, request, *args, **kwargs):
         if request.method.lower() == 'post':
             return self.create(request)
 
         congregacao = self.get_object()
-        ser = serializers.ClasseSerializer(congregacao.classe_set.order_by('nome'), many=True)
+
+        ser = serializers.ClasseSerializer(
+            congregacao.classe_set.order_by('nome'),
+            many=True
+        )
 
         return Response({ 'classes': ser.data })
     
     @action(detail=True, methods=['get', 'post'])
-    def periodos(self, request, uid=None):
+    def periodos(self, request, *args, **kwargs):
         if request.method.lower() == 'post':
             return self.create(request)
 
@@ -115,11 +119,34 @@ class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
             congregacao__igreja_id=self.request.user.igreja_id
         )
 
-class PeriodoViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
-    serializer_class = serializers.PeriodoSerializer
+
+    def get_serializer_class(self):
+        if self.action == 'aulas':
+            return serializers.AulaSerializer
+        return serializers.PeriodoSerializer
 
     def get_queryset(self):
         return models.Periodo.objects.filter(
             congregacao__igreja_id=self.request.user.igreja_id
         )
+    
+    def perform_create(self, serializer):
+        periodo = self.get_object()
+
+        serializer.save(periodo=periodo)
+
+    @action(detail=True, methods=['get', 'post'])
+    def aulas(self, request, *args, **kwargs):
+        if request.method.lower() == 'post':
+            return self.create(request)
+
+        periodo = self.get_object()
+
+        ser = serializers.AulaSerializer(
+            periodo.aula_set.order_by('data_prevista', 'aula'),
+            many=True
+        )
+
+        return Response({ 'aulas': ser.data })
