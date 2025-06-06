@@ -144,7 +144,9 @@ class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
             matricula__periodo__uid=periodo_uid
         ).order_by('nome')
 
-        return Response(serializers.AlunoSerializer(qs, many=True).data)
+        ser = serializers.AlunoSerializer(qs, many=True)
+
+        return Response({ 'alunos': ser.data })
 
 class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
