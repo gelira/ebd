@@ -2,6 +2,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.exceptions import MethodNotAllowed
 
 from . import models, serializers
 
@@ -131,7 +132,13 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         return models.Periodo.objects.filter(
             congregacao__igreja_id=self.request.user.igreja_id
         )
-    
+
+    def create(self, request, *args, **kwargs):
+        if self.action == 'create':
+            raise MethodNotAllowed('POST')
+
+        return super().create(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         periodo = self.get_object()
 
