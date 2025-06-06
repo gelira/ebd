@@ -120,6 +120,32 @@ class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
             congregacao__igreja_id=self.request.user.igreja_id
         )
 
+    @action(detail=True, methods=['get', 'post'])
+    def matriculas(self, request, *args, **kwargs):
+        periodo_uid = request.query_params.get('periodo_uid')
+
+        if not periodo_uid:
+            return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
+        
+        if request.method.lower() == 'post':
+            ser = serializers.MatriculaSerializer(data={
+                **request.data,
+                'periodo_uid': periodo_uid,
+                'classe_uid': kwargs['uid'],
+            }, context={ 'request': request })
+
+            ser.is_valid(raise_exception=True)
+            ser.save()
+
+            return Response(status=204)
+        
+        qs = models.Aluno.objects.filter(
+            matricula__classe__uid=kwargs['uid'],
+            matricula__periodo__uid=periodo_uid
+        ).order_by('nome')
+
+        return Response(serializers.AlunoSerializer(qs, many=True).data)
+
 class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
 
