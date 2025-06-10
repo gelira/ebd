@@ -89,6 +89,15 @@ class Diario(BaseModel):
     dizimos = models.DecimalField(max_digits=20, decimal_places=2)
 
 class Presenca(BaseModel):
+    PRESENTE = 'presente'
+    AUSENTE = 'ausente'
+    AUSENCIA_JUSTIFICADA = 'ausencia_justificada'
+    PRESENCA_CHOICES = [
+        (PRESENTE, PRESENTE),
+        (AUSENTE, AUSENTE),
+        (AUSENCIA_JUSTIFICADA, AUSENCIA_JUSTIFICADA),
+    ]
+
     aluno = models.ForeignKey(Aluno, on_delete=models.PROTECT)
     diario = models.ForeignKey(Diario, on_delete=models.PROTECT)
-    presenca = models.CharField(max_length=50)
+    presenca = models.CharField(choices=PRESENCA_CHOICES)
