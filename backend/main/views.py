@@ -187,5 +187,9 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         return Response({ 'aulas': ser.data })
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
-    lookup_field = 'uid'
     serializer_class = serializers.DiarioSerializer
+
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+
+        return Response(status=204)

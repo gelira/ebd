@@ -150,7 +150,6 @@ class PresencaSerializer(serializers.ModelSerializer):
 class DiarioSerializer(serializers.ModelSerializer):
     aula_uid = serializers.UUIDField(write_only=True)
     classe_uid = serializers.UUIDField(write_only=True)
-    periodo_uid = serializers.UUIDField(write_only=True)
     presencas = serializers.ListField(
         child=PresencaSerializer(),
         allow_empty=False,
@@ -162,21 +161,14 @@ class DiarioSerializer(serializers.ModelSerializer):
 
         aula_uid = attrs['aula_uid']
         classe_uid = attrs['classe_uid']
-        periodo_uid = attrs['periodo_uid']
         presencas = attrs['presencas']
-
-        periodo = get_object_or_404(
-            models.Periodo,
-            congregacao__igreja_id=igreja_id,
-            concluido=False,
-            uid=periodo_uid
-        )
 
         aula = get_object_or_404(
             models.Aula,
             uid=aula_uid,
             concluida=False,
-            periodo_id=periodo.id
+            periodo__concluido=False,
+            periodo__congregacao__igreja_id=igreja_id
         )
 
         classe = get_object_or_404(
@@ -191,7 +183,7 @@ class DiarioSerializer(serializers.ModelSerializer):
         presencas_alunos_dict = {}
 
         alunos = models.Aluno.objects.filter(
-            matricula__periodo_id=periodo.id,
+            matricula__periodo_id=aula.periodo.id,
             matricula__classe_id=classe.id
         )
 
@@ -209,7 +201,6 @@ class DiarioSerializer(serializers.ModelSerializer):
         attrs.update({
             'aula': aula,
             'classe': classe,
-            'periodo': periodo,
             'presencas_alunos': presencas_alunos_dict.values()
         })
 
@@ -254,7 +245,6 @@ class DiarioSerializer(serializers.ModelSerializer):
         fields = [
             'aula_uid',
             'classe_uid',
-            'periodo_uid',
             'presencas',
             'data_aula',
             'quantidade_visitantes',
