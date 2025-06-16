@@ -185,3 +185,7 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         )
 
         return Response({ 'aulas': ser.data })
+
+class DiarioViewSet(CreateModelMixin, GenericViewSet):
+    lookup_field = 'uid'
+    serializer_class = serializers.DiarioSerializer
