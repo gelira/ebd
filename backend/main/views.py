@@ -50,12 +50,23 @@ class AlunoViewSet(ModelViewSet):
 
 class CongregacaoViewSet(ModelViewSet):
     lookup_field = 'uid'
+    lookup_value_converter = 'uuid'
 
     def get_queryset(self):
-        return models.Congregacao.objects\
-            .filter(igreja_id=self.request.user.igreja_id)\
-                .order_by('nome')
-    
+        user = self.request.user
+
+        filter_dict = {
+            'igreja_id': user.igreja_id
+        }
+
+        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+            filter_dict['id'] = user.entity_id
+
+        elif user.role == models.Usuario.PROFESSOR:
+            filter_dict['classe__id'] = user.entity_id
+
+        return models.Congregacao.objects.filter(**filter_dict).order_by('nome')
+
     def get_serializer_class(self):
         if self.action == 'classes':
             return serializers.ClasseSerializer
