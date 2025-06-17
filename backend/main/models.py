@@ -9,10 +9,23 @@ class Igreja(BaseModel):
     nome = models.CharField(max_length=200)
 
 class Usuario(BaseModel):
+    SUPERINTENDENTE_GERAL = 'superintendente-geral'
+    SUPERINTENDENTE_CONGREGACAO = 'superintendente-congregacao'
+    SECRETARIO_GERAL = 'secretario-geral'
+    SECRETARIO_CONGREGACAO = 'secretario-congregacao'
+    PROFESSOR = 'professor'
+    ROLE_CHOICES = [
+        (SUPERINTENDENTE_GERAL, SUPERINTENDENTE_GERAL),
+        (SUPERINTENDENTE_CONGREGACAO, SUPERINTENDENTE_CONGREGACAO),
+        (SECRETARIO_GERAL, SECRETARIO_GERAL),
+        (SECRETARIO_CONGREGACAO, SECRETARIO_CONGREGACAO),
+        (PROFESSOR, PROFESSOR),
+    ]
+
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
     nome = models.CharField(max_length=200)
     email = models.EmailField()
-    role = models.CharField(max_length=50)
+    role = models.CharField(choices=ROLE_CHOICES, max_length=50)
     entity_id = models.BigIntegerField(null=True)
 
 class AuthCode(BaseModel):
