@@ -1,3 +1,4 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
@@ -188,6 +189,31 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
+
+    def list(self, request, *args, **kwargs):
+        igreja_id = request.user.igreja_id
+
+        classe = get_object_or_404(
+            models.Classe,
+            uid=request.query_params.get('classe_uid'),
+            congregacao__igreja_id=igreja_id
+        )
+
+        aula = get_object_or_404(
+            models.Aula,
+            uid=request.query_params.get('aula_uid'),
+            periodo__congregacao__igreja_id=igreja_id
+        )
+
+        diario = get_object_or_404(
+            models.Diario,
+            aula_id=aula.id,
+            classe_id=classe.id
+        )
+
+        ser = serializers.ReadDiarioSerializer(diario)
+
+        return Response(ser.data)
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

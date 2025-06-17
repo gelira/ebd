@@ -1,6 +1,6 @@
-from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
 
 from . import models, email, exceptions
@@ -147,6 +147,14 @@ class PresencaSerializer(serializers.ModelSerializer):
         model = models.Presenca
         fields = ['aluno_uid', 'presenca']
 
+class ReadPresencaSerializer(serializers.ModelSerializer):
+    aluno_uid = serializers.UUIDField(source='aluno.uid')
+    nome = serializers.CharField(source='aluno.nome')
+
+    class Meta:
+        model = models.Presenca
+        fields = ['aluno_uid', 'nome', 'presenca']
+
 class DiarioSerializer(serializers.ModelSerializer):
     aula_uid = serializers.UUIDField(write_only=True)
     classe_uid = serializers.UUIDField(write_only=True)
@@ -278,3 +286,50 @@ class DiarioSerializer(serializers.ModelSerializer):
                 'write_only': True
             }
         }
+
+class ReadDiarioSerializer(serializers.ModelSerializer):
+    aula = serializers.SerializerMethodField()
+    classe = serializers.SerializerMethodField()
+    presencas = serializers.SerializerMethodField()
+
+    def get_aula(self, obj):
+        aula = obj.aula
+        periodo = aula.periodo
+
+        return {
+            'uid': str(aula.uid),
+            'aula': aula.aula,
+            'periodo': periodo.periodo,
+            'ano': periodo.ano
+        }
+    
+    def get_classe(self, obj):
+        classe = obj.classe
+
+        return {
+            'uid': str(classe.uid),
+            'nome': classe.nome,
+            'congregacao': classe.congregacao.nome,
+        }
+    
+    def get_presencas(self, obj):
+        presencas = obj.presenca_set.order_by('aluno__nome')
+
+        return ReadPresencaSerializer(presencas, many=True).data
+
+    class Meta:
+        model = models.Diario
+        fields = [
+            'uid',
+            'aula',
+            'classe',
+            'presencas',
+            'data_aula',
+            'quantidade_presentes',
+            'quantidade_ausentes',
+            'quantidade_visitantes',
+            'quantidade_biblias',
+            'quantidade_revistas',
+            'ofertas',
+            'dizimos'
+        ]
