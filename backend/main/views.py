@@ -99,10 +99,12 @@ class CongregacaoViewSet(ModelViewSet):
 
         congregacao = self.get_object()
 
-        ser = serializers.ClasseSerializer(
-            congregacao.classe_set.order_by('nome'),
-            many=True
-        )
+        qs = congregacao.classe_set.order_by('nome')
+
+        if request.user.role == models.Usuario.PROFESSOR:
+            qs = qs.filter(id=request.user.entity_id)
+
+        ser = serializers.ClasseSerializer(qs, many=True)
 
         return Response({ 'classes': ser.data })
     
