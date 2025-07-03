@@ -125,37 +125,63 @@ class CongregacaoViewSet(ModelViewSet):
 
         return Response({ 'periodos': ser.data })
 
-class ClasseViewSet(UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+class ClasseViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
-    serializer_class = serializers.ClasseSerializer
+    lookup_value_converter = 'uuid'
+
+    def get_serializer_class(self):
+        if self.action == 'matriculas':
+            return serializers.MatriculaSerializer
+
+        return serializers.ClasseSerializer
 
     def get_queryset(self):
-        return models.Classe.objects.filter(
-            congregacao__igreja_id=self.request.user.igreja_id
-        )
+        user = self.request.user
+
+        filter_dict = {
+            'congregacao__igreja_id': user.igreja_id
+        }
+
+        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+            filter_dict['congregacao_id'] = user.entity_id
+
+        elif user.role == models.Usuario.PROFESSOR:
+            filter_dict['id'] = user.entity_id
+
+        return models.Classe.objects.filter(**filter_dict).order_by('nome')
+    
+    def create(self, request, *args, **kwargs):
+        if self.action == 'create':
+            raise MethodNotAllowed('POST')
+        
+        super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        serializer.save(classe=self.get_object())
 
     @action(detail=True, methods=['get', 'post'])
     def matriculas(self, request, *args, **kwargs):
+        if request.method.lower() == 'post':
+            self.create(request)
+
+            return Response(status=204)
+
         periodo_uid = request.query_params.get('periodo_uid')
 
         if not periodo_uid:
             return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
         
-        if request.method.lower() == 'post':
-            ser = serializers.MatriculaSerializer(data={
-                **request.data,
-                'periodo_uid': periodo_uid,
-                'classe_uid': kwargs['uid'],
-            }, context={ 'request': request })
+        classe = self.get_object()
 
-            ser.is_valid(raise_exception=True)
-            ser.save()
-
-            return Response(status=204)
+        periodo = get_object_or_404(
+            models.Periodo,
+            uid=periodo_uid,
+            congregacao_id=classe.congregacao_id
+        )
         
         qs = models.Aluno.objects.filter(
-            matricula__classe__uid=kwargs['uid'],
-            matricula__periodo__uid=periodo_uid
+            matricula__classe_id=classe.id,
+            matricula__periodo_id=periodo.id
         ).order_by('nome')
 
         ser = serializers.AlunoSerializer(qs, many=True)

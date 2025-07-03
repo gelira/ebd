@@ -95,28 +95,30 @@ class AulaSerializer(serializers.ModelSerializer):
 
 class MatriculaSerializer(serializers.Serializer):
     aluno_uid = serializers.UUIDField(write_only=True)
-    classe_uid = serializers.UUIDField(write_only=True)
     periodo_uid = serializers.UUIDField(write_only=True)
 
     def validate(self, attrs):
-        igreja_id = self.context['request'].user.igreja_id
+        user = self.context['request'].user
 
-        aluno = models.Aluno.objects.filter(igreja_id=igreja_id, uid=attrs['aluno_uid']).first()
+        aluno = models.Aluno.objects.filter(igreja_id=user.igreja_id, uid=attrs['aluno_uid']).first()
+        
         if not aluno:
             raise serializers.ValidationError('Aluno not found')
 
-        classe = models.Classe.objects.filter(
-            congregacao__igreja_id=igreja_id,
-            uid=attrs['classe_uid']
-        ).first()
+        periodo_filter = {
+            'uid': attrs['periodo_uid']
+        }
 
-        if not classe:
-            raise serializers.ValidationError('Classe not found')
+        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+            periodo_filter['congregacao_id'] = user.entity_id
 
-        periodo = models.Periodo.objects.filter(
-            congregacao__igreja_id=igreja_id,
-            uid=attrs['periodo_uid']
-        ).first()
+        elif user.role == models.Usuario.PROFESSOR:
+            periodo_filter['congregacao__classe__id'] = user.entity_id
+
+        else:
+            periodo_filter['congregacao__igreja_id'] = user.igreja_id
+
+        periodo = models.Periodo.objects.filter(**periodo_filter).first()
 
         if not periodo:
             raise serializers.ValidationError('Periodo not found')
@@ -129,16 +131,11 @@ class MatriculaSerializer(serializers.Serializer):
 
         return {
             'aluno': aluno,
-            'classe': classe,
             'periodo': periodo,
         }
 
     def create(self, data):
-        return models.Matricula.objects.create(
-            aluno=data['aluno'],
-            classe=data['classe'],
-            periodo=data['periodo']
-        )
+        return models.Matricula.objects.create(**data)
 
 class PresencaSerializer(serializers.ModelSerializer):
     aluno_uid = serializers.UUIDField()
