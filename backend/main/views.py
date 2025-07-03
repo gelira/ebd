@@ -138,15 +138,16 @@ class ClasseViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gener
     def get_queryset(self):
         user = self.request.user
 
-        filter_dict = {
-            'congregacao__igreja_id': user.igreja_id
-        }
+        filter_dict = {}
 
         if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
             filter_dict['congregacao_id'] = user.entity_id
 
         elif user.role == models.Usuario.PROFESSOR:
             filter_dict['id'] = user.entity_id
+
+        else:
+            filter_dict['congregacao__igreja_id'] = user.igreja_id
 
         return models.Classe.objects.filter(**filter_dict).order_by('nome')
     
