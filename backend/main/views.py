@@ -7,6 +7,13 @@ from rest_framework.exceptions import MethodNotAllowed
 
 from . import models, serializers
 
+PROFESSOR = models.Usuario.PROFESSOR
+
+CARGOS_CONGREGACAO = [
+    models.Usuario.SECRETARIO_CONGREGACAO,
+    models.Usuario.SUPERINTENDENTE_CONGREGACAO
+]
+
 class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     authentication_classes = []
     permission_classes = []
@@ -59,10 +66,10 @@ class CongregacaoViewSet(ModelViewSet):
             'igreja_id': user.igreja_id
         }
 
-        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+        if user.role in CARGOS_CONGREGACAO:
             filter_dict['id'] = user.entity_id
 
-        elif user.role == models.Usuario.PROFESSOR:
+        elif user.role == PROFESSOR:
             filter_dict['classe__id'] = user.entity_id
 
         return models.Congregacao.objects.filter(**filter_dict).order_by('nome')
@@ -101,7 +108,7 @@ class CongregacaoViewSet(ModelViewSet):
 
         qs = congregacao.classe_set.order_by('nome')
 
-        if request.user.role == models.Usuario.PROFESSOR:
+        if request.user.role == PROFESSOR:
             qs = qs.filter(id=request.user.entity_id)
 
         ser = serializers.ClasseSerializer(qs, many=True)
@@ -140,10 +147,10 @@ class ClasseViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gener
 
         filter_dict = {}
 
-        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+        if user.role in CARGOS_CONGREGACAO:
             filter_dict['congregacao_id'] = user.entity_id
 
-        elif user.role == models.Usuario.PROFESSOR:
+        elif user.role == PROFESSOR:
             filter_dict['id'] = user.entity_id
 
         else:
@@ -204,10 +211,10 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
 
         filter_dict = {}
 
-        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+        if user.role in CARGOS_CONGREGACAO:
             filter_dict['congregacao_id'] = user.entity_id
 
-        elif user.role == models.Usuario.PROFESSOR:
+        elif user.role == PROFESSOR:
             filter_dict['congregacao__classe__id'] = user.entity_id
 
         else:
