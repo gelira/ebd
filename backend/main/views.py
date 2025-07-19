@@ -5,13 +5,15 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import MethodNotAllowed
 
-from . import models, serializers
+from . import models, serializers, utils
 
 PROFESSOR = models.Usuario.PROFESSOR
+SECRETARIO_CONGREGACAO = models.Usuario.SECRETARIO_CONGREGACAO
+SUPERINTENDENTE_CONGREGACAO = models.Usuario.SUPERINTENDENTE_CONGREGACAO
 
 CARGOS_CONGREGACAO = [
-    models.Usuario.SECRETARIO_CONGREGACAO,
-    models.Usuario.SUPERINTENDENTE_CONGREGACAO
+    SECRETARIO_CONGREGACAO,
+    SUPERINTENDENTE_CONGREGACAO
 ]
 
 class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
@@ -249,19 +251,12 @@ class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
 
     def list(self, request, *args, **kwargs):
-        igreja_id = request.user.igreja_id
+        user = request.user
+        classe_uid = request.query_params.get('classe_uid')
+        aula_uid = request.query_params.get('aula_uid')
 
-        classe = get_object_or_404(
-            models.Classe,
-            uid=request.query_params.get('classe_uid'),
-            congregacao__igreja_id=igreja_id
-        )
-
-        aula = get_object_or_404(
-            models.Aula,
-            uid=request.query_params.get('aula_uid'),
-            periodo__congregacao__igreja_id=igreja_id
-        )
+        classe = utils.get_classe(user, classe_uid)
+        aula = utils.get_aula(user, aula_uid)
 
         diario = get_object_or_404(
             models.Diario,

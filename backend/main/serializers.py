@@ -3,7 +3,7 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
 
-from . import models, email, exceptions
+from . import models, email, exceptions, utils
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
@@ -162,25 +162,14 @@ class DiarioSerializer(serializers.ModelSerializer):
     )
 
     def validate(self, attrs):
-        igreja_id = self.context['request'].user.igreja_id
+        user = self.context['request'].user
 
         aula_uid = attrs['aula_uid']
         classe_uid = attrs['classe_uid']
         presencas = attrs['presencas']
 
-        aula = get_object_or_404(
-            models.Aula,
-            uid=aula_uid,
-            concluida=False,
-            periodo__concluido=False,
-            periodo__congregacao__igreja_id=igreja_id
-        )
-
-        classe = get_object_or_404(
-            models.Classe,
-            uid=classe_uid,
-            congregacao__igreja_id=igreja_id
-        )
+        aula = utils.get_aula(user, aula_uid, True)
+        classe = utils.get_classe(user, classe_uid)
 
         if models.Diario.objects.filter(aula_id=aula.id, classe_id=classe.id).exists():
             raise serializers.ValidationError('Diário já registrado')
