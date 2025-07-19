@@ -191,16 +191,29 @@ class ClasseViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gener
 
 class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     lookup_field = 'uid'
+    lookup_value_converter = 'uuid'
 
     def get_serializer_class(self):
         if self.action == 'aulas':
             return serializers.AulaSerializer
+
         return serializers.PeriodoSerializer
 
     def get_queryset(self):
-        return models.Periodo.objects.filter(
-            congregacao__igreja_id=self.request.user.igreja_id
-        )
+        user = self.request.user
+
+        filter_dict = {}
+
+        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
+            filter_dict['congregacao_id'] = user.entity_id
+
+        elif user.role == models.Usuario.PROFESSOR:
+            filter_dict['congregacao__classe__id'] = user.entity_id
+
+        else:
+            filter_dict['congregacao__igreja_id'] = user.igreja_id
+
+        return models.Periodo.objects.filter(**filter_dict).order_by('-ano', 'periodo')
 
     def create(self, request, *args, **kwargs):
         if self.action == 'create':
@@ -209,9 +222,7 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        periodo = self.get_object()
-
-        serializer.save(periodo=periodo)
+        serializer.save(periodo=self.get_object())
 
     @action(detail=True, methods=['get', 'post'])
     def aulas(self, request, *args, **kwargs):
