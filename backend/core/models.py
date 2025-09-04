@@ -27,7 +27,7 @@ class Usuario(BaseModel):
     ]
 
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
-    congregacao = models.ForeignKey(Congregacao, on_delete=models.SET_NULL, null=True, blank=True)
+    congregacao = models.ForeignKey(Congregacao, on_delete=models.PROTECT)
     classe = models.ForeignKey(Classe, on_delete=models.SET_NULL, null=True, blank=True)
     nome = models.CharField(max_length=200)
     email = models.EmailField()
