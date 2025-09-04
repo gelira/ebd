@@ -12,9 +12,15 @@ class Congregacao(BaseModel):
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
     nome = models.CharField(max_length=200)
 
+    class Meta:
+        ordering = ['nome']
+
 class Classe(BaseModel):
     congregacao = models.ForeignKey(Congregacao, on_delete=models.PROTECT)
     nome = models.CharField(max_length=200)
+
+    class Meta:
+        ordering = ['nome']
 
 class Usuario(BaseModel):
     SUPERINTENDENTE = 'superintendente'
@@ -70,10 +76,16 @@ class Periodo(BaseModel):
     ano = models.CharField(max_length=20)
     concluido = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['-ano', 'periodo']
+
 class Aluno(BaseModel):
     igreja = models.ForeignKey(Igreja, on_delete=models.PROTECT)
     nome = models.TextField()
     data_nascimento = models.DateField(null=True)
+
+    class Meta:
+        ordering = ['nome']
 
 class Aula(BaseModel):
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT)
@@ -81,10 +93,16 @@ class Aula(BaseModel):
     data_prevista = models.DateField()
     concluida = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['aula']
+
 class Matricula(BaseModel):
     aluno = models.ForeignKey(Aluno, on_delete=models.PROTECT)
     classe = models.ForeignKey(Classe, on_delete=models.PROTECT)
     periodo = models.ForeignKey(Periodo, on_delete=models.PROTECT)
+
+    class Meta:
+        ordering = ['aluno__nome']
 
 class Diario(BaseModel):
     aula = models.ForeignKey(Aula, on_delete=models.PROTECT)
