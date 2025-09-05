@@ -3,9 +3,10 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed
+from rest_framework.exceptions import MethodNotAllowed, ParseError
+from utils import validate_uuid
 
-from . import models, serializers, utils
+from . import models, serializers
 
 class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     authentication_classes = []
@@ -34,10 +35,31 @@ class AlunoViewSet(ModelViewSet):
     def get_queryset(self):
         qs = models.Aluno.objects.filter(igreja_id=self.request.user.igreja_id)
 
-        nome = self.request.query_params.get('nome')
+        if self.action in ['list', 'nao_matriculados']:
+            nome = self.request.query_params.get('nome')
 
-        if self.action == 'list' and nome:
-            qs = qs.filter(nome__icontains=nome)
+            if nome:
+                qs = qs.filter(nome__icontains=nome)
+
+        if self.action == 'nao_matriculados':
+            periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+    
+            if not periodo_uid:
+                raise ParseError('periodo_uid invalid', 'invalid_params')
+            
+            igreja_id = self.request.user.igreja_id
+
+            periodo = models.Periodo.objects.filter(uid=periodo_uid, igreja_id=igreja_id).first()
+
+            if not periodo:
+                raise ParseError('periodo_uid invalid', 'invalid_params')
+            
+            congregacao_id = self.request.user.congregacao_id
+
+            qs = qs.exclude(
+                matricula__periodo_id=periodo.id,
+                matricula__classe__congregacao_id=congregacao_id
+            )
 
         return qs
     
@@ -48,6 +70,10 @@ class AlunoViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'alunos': response.data })
+    
+    @action(detail=False, methods=['get'], url_path='nao-matriculados')
+    def nao_matriculados(self, request):
+        return self.list(request)
 
 class CongregacaoViewSet(ModelViewSet):
     lookup_field = 'uid'
