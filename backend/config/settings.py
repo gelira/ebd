@@ -152,11 +152,14 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'main.authentication.CustomJWTAuthentication',
+        'core.authentication.CustomJWTAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'main.permissions.IsAuthenticatedPermission',
+        'core.permissions.IsAuthenticatedPermission',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ]
 }
 
 SIMPLE_JWT = {
