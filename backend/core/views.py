@@ -15,6 +15,7 @@ class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     def get_serializer_class(self):
         if self.action == 'verify':
             return serializers.AuthCodeVerifySerializer
+
         return serializers.LoginSerializer
 
     def create(self, request, *args, **kwargs):
@@ -187,23 +188,23 @@ class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
 
-    def list(self, request, *args, **kwargs):
-        user = request.user
-        classe_uid = request.query_params.get('classe_uid')
-        aula_uid = request.query_params.get('aula_uid')
+    # def list(self, request, *args, **kwargs):
+    #     user = request.user
+    #     classe_uid = request.query_params.get('classe_uid')
+    #     aula_uid = request.query_params.get('aula_uid')
 
-        classe = utils.get_classe(user, classe_uid)
-        aula = utils.get_aula(user, aula_uid)
+    #     classe = utils.get_classe(user, classe_uid)
+    #     aula = utils.get_aula(user, aula_uid)
 
-        diario = get_object_or_404(
-            models.Diario,
-            aula_id=aula.id,
-            classe_id=classe.id
-        )
+    #     diario = get_object_or_404(
+    #         models.Diario,
+    #         aula_id=aula.id,
+    #         classe_id=classe.id
+    #     )
 
-        ser = serializers.ReadDiarioSerializer(diario)
+    #     ser = serializers.ReadDiarioSerializer(diario)
 
-        return Response(ser.data)
+    #     return Response(ser.data)
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
