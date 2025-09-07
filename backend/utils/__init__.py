@@ -7,5 +7,5 @@ def validate_uuid(value):
     try:
         return uuid.UUID(value)
 
-    except ValueError:
+    except Exception:
         return None
