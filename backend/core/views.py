@@ -1,9 +1,8 @@
-from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.mixins import CreateModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from rest_framework.exceptions import MethodNotAllowed, ParseError
+from rest_framework.exceptions import ParseError
 from utils import validate_uuid
 
 from . import models, serializers
@@ -98,93 +97,51 @@ class CongregacaoViewSet(ModelViewSet):
 class ClasseViewSet(ModelViewSet):
     lookup_field = 'uid'
     lookup_value_converter = 'uuid'
-
-    def get_serializer_class(self):
-        if self.action == 'matriculas':
-            return serializers.MatriculaSerializer
-
-        return serializers.ClasseSerializer
+    serializer_class = serializers.ClasseSerializer
 
     def get_queryset(self):
         congregacao_id = self.request.user.congregacao_id
 
         return models.Classe.objects.filter(congregacao_id=congregacao_id)
-    
-    def create(self, request, *args, **kwargs):
-        if self.action == 'create':
-            raise MethodNotAllowed('POST')
-        
-        super().create(request, *args, **kwargs)
 
-    def perform_create(self, serializer):
-        serializer.save(classe=self.get_object())
+    # @action(detail=True, methods=['get', 'post'])
+    # def matriculas(self, request, *args, **kwargs):
+    #     if request.method.lower() == 'post':
+    #         self.create(request)
 
-    @action(detail=True, methods=['get', 'post'])
-    def matriculas(self, request, *args, **kwargs):
-        if request.method.lower() == 'post':
-            self.create(request)
+    #         return Response(status=204)
 
-            return Response(status=204)
+    #     periodo_uid = request.query_params.get('periodo_uid')
 
-        periodo_uid = request.query_params.get('periodo_uid')
+    #     if not periodo_uid:
+    #         return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
 
-        if not periodo_uid:
-            return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
+    #     classe = self.get_object()
 
-        classe = self.get_object()
+    #     periodo = get_object_or_404(
+    #         models.Periodo,
+    #         uid=periodo_uid,
+    #         congregacao_id=classe.congregacao_id
+    #     )
 
-        periodo = get_object_or_404(
-            models.Periodo,
-            uid=periodo_uid,
-            congregacao_id=classe.congregacao_id
-        )
+    #     qs = models.Aluno.objects.filter(
+    #         matricula__classe_id=classe.id,
+    #         matricula__periodo_id=periodo.id
+    #     )
 
-        qs = models.Aluno.objects.filter(
-            matricula__classe_id=classe.id,
-            matricula__periodo_id=periodo.id
-        )
+    #     ser = serializers.AlunoSerializer(qs, many=True)
 
-        ser = serializers.AlunoSerializer(qs, many=True)
+    #     return Response({ 'alunos': ser.data })
 
-        return Response({ 'alunos': ser.data })
-
-class PeriodoViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+class PeriodoViewSet(ModelViewSet):
     lookup_field = 'uid'
     lookup_value_converter = 'uuid'
-
-    def get_serializer_class(self):
-        if self.action == 'aulas':
-            return serializers.AulaSerializer
-
-        return serializers.PeriodoSerializer
+    serializer_class = serializers.PeriodoSerializer
 
     def get_queryset(self):
         igreja_id = self.request.user.igreja_id
 
         return models.Periodo.objects.filter(igreja_id=igreja_id)
-
-    def create(self, request, *args, **kwargs):
-        if self.action == 'create':
-            raise MethodNotAllowed('POST')
-
-        return super().create(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
-        serializer.save(periodo=self.get_object())
-
-    @action(detail=True, methods=['get', 'post'])
-    def aulas(self, request, *args, **kwargs):
-        if request.method.lower() == 'post':
-            return self.create(request)
-
-        periodo = self.get_object()
-
-        ser = serializers.AulaSerializer(
-            periodo.aula_set.order_by('data_prevista', 'aula'),
-            many=True
-        )
-
-        return Response({ 'aulas': ser.data })
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
