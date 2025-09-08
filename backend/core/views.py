@@ -30,8 +30,9 @@ class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
         return self.create(request)
 
 class AlunoViewSet(ModelViewSet):
-    serializer_class = serializers.AlunoSerializer
     lookup_field = 'uid'
+    lookup_value_converter = 'uuid'
+    serializer_class = serializers.AlunoSerializer
 
     def get_queryset(self):
         qs = models.Aluno.objects.filter(igreja_id=self.request.user.igreja_id)
@@ -44,17 +45,17 @@ class AlunoViewSet(ModelViewSet):
 
         if self.action == 'nao_matriculados':
             periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
-    
+
             if not periodo_uid:
                 raise ParseError('periodo_uid invalid', 'invalid_params')
-            
+
             igreja_id = self.request.user.igreja_id
 
             periodo = models.Periodo.objects.filter(uid=periodo_uid, igreja_id=igreja_id).first()
 
             if not periodo:
                 raise ParseError('periodo_uid invalid', 'invalid_params')
-            
+
             congregacao_id = self.request.user.congregacao_id
 
             qs = qs.exclude(
@@ -63,7 +64,7 @@ class AlunoViewSet(ModelViewSet):
             )
 
         return qs
-    
+
     def perform_create(self, serializer):
         serializer.save(igreja_id=self.request.user.igreja_id)
 
@@ -71,7 +72,7 @@ class AlunoViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'alunos': response.data })
-    
+
     @action(detail=False, methods=['get'], url_path='nao-matriculados')
     def nao_matriculados(self, request):
         return self.list(request)
@@ -85,7 +86,7 @@ class CongregacaoViewSet(ModelViewSet):
         congregacao_id = self.request.user.congregacao_id
 
         return models.Congregacao.objects.filter(pk=congregacao_id)
-    
+
     def perform_create(self, serializer):
         serializer.save(igreja_id=self.request.user.igreja_id)
 
@@ -129,7 +130,7 @@ class ClasseViewSet(ModelViewSet):
 
         if not periodo_uid:
             return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
-        
+
         classe = self.get_object()
 
         periodo = get_object_or_404(
@@ -137,7 +138,7 @@ class ClasseViewSet(ModelViewSet):
             uid=periodo_uid,
             congregacao_id=classe.congregacao_id
         )
-        
+
         qs = models.Aluno.objects.filter(
             matricula__classe_id=classe.id,
             matricula__periodo_id=periodo.id
