@@ -1,3 +1,4 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
@@ -142,6 +143,30 @@ class PeriodoViewSet(ModelViewSet):
         igreja_id = self.request.user.igreja_id
 
         return models.Periodo.objects.filter(igreja_id=igreja_id)
+
+class AulaViewSet(ModelViewSet):
+    lookup_field = 'uid'
+    lookup_value_converter = 'uuid'
+    serializer_class = serializers.AulaSerializer
+
+    def get_queryset(self):
+        igreja_id = self.request.user.igreja_id
+
+        if self.action != 'list':
+            return models.Aula.objects.filter(periodo__igreja_id=igreja_id)
+        
+        periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+
+        if not periodo_uid:
+            raise ParseError('periodo_uid invalid', 'invalid_params')
+
+        periodo = get_object_or_404(
+            models.Periodo,
+            uid=periodo_uid,
+            igreja_id=igreja_id
+        )
+
+        return models.Aula.objects.filter(periodo_id=periodo.pk)
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
