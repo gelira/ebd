@@ -100,7 +100,10 @@ class MatriculaSerializer(serializers.Serializer):
 
     def validate_aluno_uid(self, value):
         user = self.context['request'].user
-        aluno = models.Aluno.objects.filter(igreja_id=user.igreja_id, uid=value).first()
+        aluno = models.Aluno.objects.filter(
+            igreja_id=user.igreja_id,
+            uid=value
+        ).first()
 
         if not aluno:
             raise serializers.ValidationError('Aluno not found.')
@@ -109,7 +112,10 @@ class MatriculaSerializer(serializers.Serializer):
 
     def validate_classe_uid(self, value):
         user = self.context['request'].user
-        classe = models.Classe.objects.filter(congregacao__igreja_id=user.igreja_id, uid=value).first()
+        classe = models.Classe.objects.filter(
+            congregacao__igreja_id=user.igreja_id,
+            uid=value
+        ).first()
 
         if not classe:
             raise serializers.ValidationError('Classe not found.')
@@ -118,7 +124,10 @@ class MatriculaSerializer(serializers.Serializer):
 
     def validate_periodo_uid(self, value):
         user = self.context['request'].user
-        periodo = models.Periodo.objects.filter(igreja_id=user.igreja_id, uid=value).first()
+        periodo = models.Periodo.objects.filter(
+            igreja_id=user.igreja_id,
+            uid=value
+        ).first()
 
         if not periodo:
             raise serializers.ValidationError('Periodo not found.')
@@ -130,8 +139,13 @@ class MatriculaSerializer(serializers.Serializer):
         classe = attrs['classe_uid']
         periodo = attrs['periodo_uid']
 
-        if models.Matricula.objects.filter(aluno=aluno, periodo=periodo).exists():
-            raise serializers.ValidationError('Aluno already has an active enrollment for this period.')
+        if models.Matricula.objects.filter(
+            aluno_id=aluno.id,
+            periodo_id=periodo.id
+        ).exists():
+            raise serializers.ValidationError(
+                'Aluno already has an active enrollment for this period.'
+            )
 
         return {
             'aluno': aluno,
@@ -185,7 +199,10 @@ class DiarioSerializer(serializers.ModelSerializer):
             uid=classe_uid
         )
 
-        if models.Diario.objects.filter(aula_id=aula.id, classe_id=classe.id).exists():
+        if models.Diario.objects.filter(
+            aula_id=aula.id,
+            classe_id=classe.id
+        ).exists():
             raise serializers.ValidationError('Diário já registrado')
 
         presencas_alunos_dict = {}
@@ -196,10 +213,15 @@ class DiarioSerializer(serializers.ModelSerializer):
         )
 
         for aluno in alunos:
-            pr = next((p for p in presencas if str(p['aluno_uid']) == str(aluno.uid)), None)
+            pr = next(
+                (p for p in presencas if str(p['aluno_uid']) == str(aluno.uid)),
+                None
+            )
 
             if not pr:
-                raise serializers.ValidationError('Presença de aluno não registrada')
+                raise serializers.ValidationError(
+                    'Presença de aluno não registrada'
+                )
             
             presencas_alunos_dict[pr['aluno_uid']] = {
                 'aluno': aluno,
@@ -240,7 +262,11 @@ class DiarioSerializer(serializers.ModelSerializer):
             )
 
             to_create = [
-                models.Presenca(diario=diario, aluno=x['aluno'], presenca=x['presenca'])
+                models.Presenca(
+                    diario=diario,
+                    aluno=x['aluno'],
+                    presenca=x['presenca']
+                )
                 for x in presencas_alunos
             ]
 
