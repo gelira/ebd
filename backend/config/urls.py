@@ -6,11 +6,13 @@ from core import views
 
 router = SimpleRouter(trailing_slash=False)
 router.register(r'alunos', views.AlunoViewSet, basename='alunos')
-# router.register(r'congregacoes', views.CongregacaoViewSet, basename='congregacoes')
-# router.register(r'classes', views.ClasseViewSet, basename='classes')
-# router.register(r'periodos', views.PeriodoViewSet, basename='periodos')
-# router.register(r'diarios', views.DiarioViewSet, basename='diarios')
-# router.register(r'auth-code', views.AuthCodeViewSet, basename='auth-code')
+router.register(r'aulas', views.AuthCodeViewSet, basename='aulas')
+router.register(r'auth-code', views.AuthCodeViewSet, basename='auth-code')
+router.register(r'classes', views.ClasseViewSet, basename='classes')
+router.register(r'congregacoes', views.CongregacaoViewSet, basename='congregacoes')
+router.register(r'diarios', views.DiarioViewSet, basename='diarios')
+router.register(r'matriculas', views.MatriculaViewSet, basename='matriculas')
+router.register(r'periodos', views.PeriodoViewSet, basename='periodos')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
