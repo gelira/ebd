@@ -1,12 +1,12 @@
-from rest_framework.generics import get_object_or_404
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
-from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
-from utils import validate_uuid
+from rest_framework.generics import get_object_or_404
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from . import models, serializers
+from core import models, serializers
+from utils import validate_uuid
 
 class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     authentication_classes = []
@@ -105,35 +105,6 @@ class ClasseViewSet(ModelViewSet):
 
         return models.Classe.objects.filter(congregacao_id=congregacao_id)
 
-    # @action(detail=True, methods=['get', 'post'])
-    # def matriculas(self, request, *args, **kwargs):
-    #     if request.method.lower() == 'post':
-    #         self.create(request)
-
-    #         return Response(status=204)
-
-    #     periodo_uid = request.query_params.get('periodo_uid')
-
-    #     if not periodo_uid:
-    #         return Response({ 'error': 'periodo_uid must be specified as query param' }, status=400)
-
-    #     classe = self.get_object()
-
-    #     periodo = get_object_or_404(
-    #         models.Periodo,
-    #         uid=periodo_uid,
-    #         congregacao_id=classe.congregacao_id
-    #     )
-
-    #     qs = models.Aluno.objects.filter(
-    #         matricula__classe_id=classe.id,
-    #         matricula__periodo_id=periodo.id
-    #     )
-
-    #     ser = serializers.AlunoSerializer(qs, many=True)
-
-    #     return Response({ 'alunos': ser.data })
-
 class PeriodoViewSet(ModelViewSet):
     lookup_field = 'uid'
     lookup_value_converter = 'uuid'
@@ -221,23 +192,39 @@ class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
 
-    # def list(self, request, *args, **kwargs):
-    #     user = request.user
-    #     classe_uid = request.query_params.get('classe_uid')
-    #     aula_uid = request.query_params.get('aula_uid')
+    def list(self, request, *args, **kwargs):
+        aula_uid = validate_uuid(self.request.query_params.get('aula_uid'))
+        classe_uid = validate_uuid(self.request.query_params.get('classe_uid'))
 
-    #     classe = utils.get_classe(user, classe_uid)
-    #     aula = utils.get_aula(user, aula_uid)
+        if not classe_uid:
+            raise ParseError('classe_uid invalid', 'invalid_params')
 
-    #     diario = get_object_or_404(
-    #         models.Diario,
-    #         aula_id=aula.id,
-    #         classe_id=classe.id
-    #     )
+        if not aula_uid:
+            raise ParseError('aula_uid invalid', 'invalid_params')
 
-    #     ser = serializers.ReadDiarioSerializer(diario)
+        user = request.user
 
-    #     return Response(ser.data)
+        aula = get_object_or_404(
+            models.Aula,
+            periodo__igreja_id=user.igreja_id,
+            uid=aula_uid
+        )
+
+        classe = get_object_or_404(
+            models.Classe,
+            congregacao_id=user.congregacao_id,
+            uid=classe_uid
+        )
+
+        diario = get_object_or_404(
+            models.Diario,
+            aula_id=aula.id,
+            classe_id=classe.id
+        )
+
+        ser = serializers.ReadDiarioSerializer(diario)
+
+        return Response(ser.data)
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)

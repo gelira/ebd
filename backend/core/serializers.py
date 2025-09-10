@@ -1,8 +1,9 @@
 from django.db import transaction
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
 from rest_framework_simplejwt.tokens import AccessToken
 
-from . import models, email, exceptions, utils
+from core import models, email, exceptions
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
@@ -172,8 +173,17 @@ class DiarioSerializer(serializers.ModelSerializer):
         classe_uid = attrs['classe_uid']
         presencas = attrs['presencas']
 
-        aula = utils.get_aula(user, aula_uid, True)
-        classe = utils.get_classe(user, classe_uid)
+        aula = get_object_or_404(
+            models.Aula,
+            periodo__igreja_id=user.igreja_id,
+            uid=aula_uid
+        )
+
+        classe = get_object_or_404(
+            models.Classe,
+            congregacao_id=user.congregacao_id,
+            uid=classe_uid
+        )
 
         if models.Diario.objects.filter(aula_id=aula.id, classe_id=classe.id).exists():
             raise serializers.ValidationError('Diário já registrado')
@@ -181,7 +191,7 @@ class DiarioSerializer(serializers.ModelSerializer):
         presencas_alunos_dict = {}
 
         alunos = models.Aluno.objects.filter(
-            matricula__periodo_id=aula.periodo.id,
+            matricula__periodo_id=aula.periodo_id,
             matricula__classe_id=classe.id
         )
 
@@ -229,10 +239,10 @@ class DiarioSerializer(serializers.ModelSerializer):
                 dizimos=data['dizimos']
             )
 
-            to_create = list(map(
-                lambda x: models.Presenca(diario=diario, aluno=x['aluno'], presenca=x['presenca']),
-                presencas_alunos
-            ))
+            to_create = [
+                models.Presenca(diario=diario, aluno=x['aluno'], presenca=x['presenca'])
+                for x in presencas_alunos
+            ]
 
             models.Presenca.objects.bulk_create(to_create)
 
