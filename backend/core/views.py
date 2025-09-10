@@ -142,7 +142,15 @@ class PeriodoViewSet(ModelViewSet):
     def get_queryset(self):
         igreja_id = self.request.user.igreja_id
 
-        return models.Periodo.objects.filter(igreja_id=igreja_id)
+        qs = models.Periodo.objects.filter(igreja_id=igreja_id)
+
+        if self.action == 'list':
+            ano = self.request.query_params.get('ano')
+
+            if ano:
+                qs = qs.filter(ano=ano)
+
+        return qs
 
 class AulaViewSet(ModelViewSet):
     lookup_field = 'uid'
