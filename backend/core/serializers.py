@@ -93,43 +93,48 @@ class AulaSerializer(serializers.ModelSerializer):
         ]
 
 class MatriculaSerializer(serializers.Serializer):
-    aluno_uid = serializers.UUIDField(write_only=True)
-    periodo_uid = serializers.UUIDField(write_only=True)
+    aluno_uid = serializers.UUIDField()
+    classe_uid = serializers.UUIDField()
+    periodo_uid = serializers.UUIDField()
 
-    def validate(self, attrs):
+    def validate_aluno_uid(self, value):
         user = self.context['request'].user
+        aluno = models.Aluno.objects.filter(igreja_id=user.igreja_id, uid=value).first()
 
-        aluno = models.Aluno.objects.filter(igreja_id=user.igreja_id, uid=attrs['aluno_uid']).first()
-        
         if not aluno:
-            raise serializers.ValidationError('Aluno not found')
+            raise serializers.ValidationError('Aluno not found.')
 
-        periodo_filter = {
-            'uid': attrs['periodo_uid']
-        }
+        return aluno
 
-        if user.role in [models.Usuario.SECRETARIO_CONGREGACAO, models.Usuario.SUPERINTENDENTE_CONGREGACAO]:
-            periodo_filter['congregacao_id'] = user.entity_id
+    def validate_classe_uid(self, value):
+        user = self.context['request'].user
+        classe = models.Classe.objects.filter(congregacao__igreja_id=user.igreja_id, uid=value).first()
 
-        elif user.role == models.Usuario.PROFESSOR:
-            periodo_filter['congregacao__classe__id'] = user.entity_id
+        if not classe:
+            raise serializers.ValidationError('Classe not found.')
 
-        else:
-            periodo_filter['congregacao__igreja_id'] = user.igreja_id
+        return classe
 
-        periodo = models.Periodo.objects.filter(**periodo_filter).first()
+    def validate_periodo_uid(self, value):
+        user = self.context['request'].user
+        periodo = models.Periodo.objects.filter(igreja_id=user.igreja_id, uid=value).first()
 
         if not periodo:
-            raise serializers.ValidationError('Periodo not found')
+            raise serializers.ValidationError('Periodo not found.')
 
-        if periodo.concluido:
-            raise serializers.ValidationError('Periodo concluído')
+        return periodo
 
-        if models.Matricula.objects.filter(aluno_id=aluno.id, periodo_id=periodo.id).exists():
-            raise serializers.ValidationError('Matricula already exists')
+    def validate(self, attrs):
+        aluno = attrs['aluno_uid']
+        classe = attrs['classe_uid']
+        periodo = attrs['periodo_uid']
+
+        if models.Matricula.objects.filter(aluno=aluno, periodo=periodo).exists():
+            raise serializers.ValidationError('Aluno already has an active enrollment for this period.')
 
         return {
             'aluno': aluno,
+            'classe': classe,
             'periodo': periodo,
         }
 

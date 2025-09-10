@@ -1,6 +1,6 @@
 from rest_framework.generics import get_object_or_404
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
@@ -167,6 +167,48 @@ class AulaViewSet(ModelViewSet):
         )
 
         return models.Aula.objects.filter(periodo_id=periodo.pk)
+
+class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.AlunoSerializer
+
+        return serializers.MatriculaSerializer
+
+    def get_queryset(self):
+        classe_uid = validate_uuid(self.request.query_params.get('classe_uid'))
+        periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+
+        if not classe_uid:
+            raise ParseError('classe_uid invalid', 'invalid_params')
+
+        if not periodo_uid:
+            raise ParseError('periodo_uid invalid', 'invalid_params')
+
+        igreja_id = self.request.user.igreja_id
+        congregacao_id = self.request.user.congregacao_id
+        
+        classe = get_object_or_404(
+            models.Classe,
+            uid=classe_uid,
+            congregacao_id=congregacao_id
+        )
+
+        periodo = get_object_or_404(
+            models.Periodo,
+            uid=periodo_uid,
+            igreja_id=igreja_id
+        )
+
+        return models.Aluno.objects.filter(
+            matricula__classe_id=classe.id,
+            matricula__periodo_id=periodo.id
+        )
+    
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'alunos': response.data })
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
