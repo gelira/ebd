@@ -208,20 +208,20 @@ class MatriculaViewSet(
 
         return Response({ 'matriculas': response.data })
 
-class DiarioViewSet(CreateModelMixin, GenericViewSet):
-    serializer_class = serializers.DiarioSerializer
+class DiarioViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return serializers.ReadDiarioSerializer
 
-    def list(self, request, *args, **kwargs):
+        return serializers.DiarioSerializer
+    
+    def get_queryset(self):
         aula_uid = validate_uuid(self.request.query_params.get('aula_uid'))
-        classe_uid = validate_uuid(self.request.query_params.get('classe_uid'))
-
-        if not classe_uid:
-            raise ParseError('classe_uid invalid', 'invalid_params')
 
         if not aula_uid:
             raise ParseError('aula_uid invalid', 'invalid_params')
-
-        user = request.user
+        
+        user = self.request.user
 
         aula = get_object_or_404(
             models.Aula,
@@ -229,21 +229,29 @@ class DiarioViewSet(CreateModelMixin, GenericViewSet):
             uid=aula_uid
         )
 
-        classe = get_object_or_404(
-            models.Classe,
-            congregacao_id=user.congregacao_id,
-            uid=classe_uid
-        )
+        filter_dict = {
+            'aula_id': aula.id,
+        }
 
-        diario = get_object_or_404(
-            models.Diario,
-            aula_id=aula.id,
-            classe_id=classe.id
-        )
+        classe_uid = validate_uuid(self.request.query_params.get('classe_uid'))
 
-        ser = serializers.ReadDiarioSerializer(diario)
+        if classe_uid:
+            classe = get_object_or_404(
+                models.Classe,
+                congregacao_id=user.congregacao_id,
+                uid=classe_uid
+            )
 
-        return Response(ser.data)
+            filter_dict.update({
+                'classe_id': classe.id
+            })
+
+        return models.Diario.objects.filter(**filter_dict)
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'diarios': response.data })
 
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
