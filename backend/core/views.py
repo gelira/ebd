@@ -105,6 +105,11 @@ class ClasseViewSet(ModelViewSet):
 
         return models.Classe.objects.filter(congregacao_id=congregacao_id)
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'classes': response.data })
+
 class PeriodoViewSet(ModelViewSet):
     lookup_field = 'uid'
     lookup_value_converter = 'uuid'
@@ -122,6 +127,11 @@ class PeriodoViewSet(ModelViewSet):
                 qs = qs.filter(ano=ano)
 
         return qs
+    
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'periodos': response.data })
 
 class AulaViewSet(ModelViewSet):
     lookup_field = 'uid'
@@ -148,6 +158,11 @@ class AulaViewSet(ModelViewSet):
         )
 
         return models.Aula.objects.filter(periodo_id=periodo.id)
+    
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        return Response({ 'aulas': response.data })
 
 class MatriculaViewSet(
     CreateModelMixin,
