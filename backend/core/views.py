@@ -209,6 +209,11 @@ class MatriculaViewSet(
             periodo_id=periodo.id
         )
     
+    def create(self, request, *args, **kwargs):
+        super().create(request, *args, **kwargs)
+
+        return Response(status=204)
+
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
 

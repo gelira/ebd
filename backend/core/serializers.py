@@ -94,9 +94,9 @@ class AulaSerializer(serializers.ModelSerializer):
         ]
 
 class MatriculaSerializer(serializers.Serializer):
-    aluno_uid = serializers.UUIDField()
-    classe_uid = serializers.UUIDField()
-    periodo_uid = serializers.UUIDField()
+    aluno_uid = serializers.UUIDField(write_only=True)
+    classe_uid = serializers.UUIDField(write_only=True)
+    periodo_uid = serializers.UUIDField(write_only=True)
 
     def validate_aluno_uid(self, value):
         user = self.context['request'].user
