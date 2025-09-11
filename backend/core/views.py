@@ -44,14 +44,19 @@ class AlunoViewSet(ModelViewSet):
                 qs = qs.filter(nome__icontains=nome)
 
         if self.action == 'nao_matriculados':
-            periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+            periodo_uid = validate_uuid(
+                self.request.query_params.get('periodo_uid')
+            )
 
             if not periodo_uid:
                 raise ParseError('periodo_uid invalid', 'invalid_params')
 
             igreja_id = self.request.user.igreja_id
 
-            periodo = models.Periodo.objects.filter(uid=periodo_uid, igreja_id=igreja_id).first()
+            periodo = models.Periodo.objects.filter(
+                uid=periodo_uid,
+                igreja_id=igreja_id
+            ).first()
 
             if not periodo:
                 raise ParseError('periodo_uid invalid', 'invalid_params')
@@ -134,7 +139,9 @@ class AulaViewSet(ModelViewSet):
         if self.action != 'list':
             return models.Aula.objects.filter(periodo__igreja_id=igreja_id)
         
-        periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+        periodo_uid = validate_uuid(
+            self.request.query_params.get('periodo_uid')
+        )
 
         if not periodo_uid:
             raise ParseError('periodo_uid invalid', 'invalid_params')
@@ -145,7 +152,7 @@ class AulaViewSet(ModelViewSet):
             igreja_id=igreja_id
         )
 
-        return models.Aula.objects.filter(periodo_id=periodo.pk)
+        return models.Aula.objects.filter(periodo_id=periodo.id)
 
 class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
     def get_serializer_class(self):
@@ -156,7 +163,10 @@ class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
 
     def get_queryset(self):
         classe_uid = validate_uuid(self.request.query_params.get('classe_uid'))
-        periodo_uid = validate_uuid(self.request.query_params.get('periodo_uid'))
+
+        periodo_uid = validate_uuid(
+            self.request.query_params.get('periodo_uid')
+        )
 
         if not classe_uid:
             raise ParseError('classe_uid invalid', 'invalid_params')
