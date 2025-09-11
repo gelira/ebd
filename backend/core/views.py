@@ -39,38 +39,33 @@ class AlunoViewSet(ModelViewSet):
     serializer_class = serializers.AlunoSerializer
 
     def get_queryset(self):
-        qs = models.Aluno.objects.filter(igreja_id=self.request.user.igreja_id)
+        igreja_id = self.request.user.igreja_id
 
-        if self.action in ['list', 'nao_matriculados']:
+        qs = models.Aluno.objects.filter(igreja_id=igreja_id)
+
+        if self.action == 'list':
             nome = self.request.query_params.get('nome')
 
             if nome:
                 qs = qs.filter(nome__icontains=nome)
 
-        if self.action == 'nao_matriculados':
             periodo_uid = validate_uuid(
-                self.request.query_params.get('periodo_uid')
+                self.request.query_params.get('sem_matricula_periodo_uid')
             )
 
-            if not periodo_uid:
-                raise ParseError('periodo_uid invalid', 'invalid_params')
+            if periodo_uid:
+                periodo = get_object_or_404(
+                    models.Periodo,
+                    uid=periodo_uid,
+                    igreja_id=igreja_id
+                )
 
-            igreja_id = self.request.user.igreja_id
+                congregacao_id = self.request.user.congregacao_id
 
-            periodo = models.Periodo.objects.filter(
-                uid=periodo_uid,
-                igreja_id=igreja_id
-            ).first()
-
-            if not periodo:
-                raise ParseError('periodo_uid invalid', 'invalid_params')
-
-            congregacao_id = self.request.user.congregacao_id
-
-            qs = qs.exclude(
-                matricula__periodo_id=periodo.id,
-                matricula__classe__congregacao_id=congregacao_id
-            )
+                qs = qs.exclude(
+                    matricula__periodo_id=periodo.id,
+                    matricula__classe__congregacao_id=congregacao_id
+                )
 
         return qs
 
@@ -81,10 +76,6 @@ class AlunoViewSet(ModelViewSet):
         response = super().list(request, *args, **kwargs)
 
         return Response({ 'alunos': response.data })
-
-    @action(detail=False, methods=['get'], url_path='nao-matriculados')
-    def nao_matriculados(self, request):
-        return self.list(request)
 
 class CongregacaoViewSet(ModelViewSet):
     lookup_field = 'uid'

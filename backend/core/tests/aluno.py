@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory, force_authenticate
 
@@ -61,20 +62,20 @@ class AlunoTeste(TestCase):
         self.assertEquals(len(response.data['alunos']), 1)
 
     def test_list_nao_matriculados_sem_periodo_uid(self):
-        request = self.factory.get('/api/alunos/nao_matriculados')
+        request = self.factory.get(f'/api/alunos?sem_matricula_periodo_uid={uuid4()}')
 
         force_authenticate(request, user=self.user)
 
-        response = AlunoViewSet.as_view({ 'get': 'nao_matriculados' })(request)
+        response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEquals(response.status_code, 404)
 
     def test_list_nao_matriculados_com_periodo_uid(self):
-        request = self.factory.get(f'/api/alunos/nao_matriculados?periodo_uid={self.periodo.uid}')
+        request = self.factory.get(f'/api/alunos?sem_matricula_periodo_uid={self.periodo.uid}')
 
         force_authenticate(request, user=self.user)
 
-        response = AlunoViewSet.as_view({ 'get': 'nao_matriculados' })(request)
+        response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
         self.assertEquals(response.status_code, 200)
         self.assertEquals(len(response.data['alunos']), 3)
