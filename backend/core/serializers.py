@@ -156,6 +156,20 @@ class MatriculaSerializer(serializers.Serializer):
     def create(self, data):
         return models.Matricula.objects.create(**data)
 
+class ReadMatriculaSerializer(serializers.ModelSerializer):
+    aluno_uid = serializers.UUIDField(source='aluno.uid')
+    nome = serializers.CharField(source='aluno.nome')
+    data_nascimento = serializers.DateField(source='aluno.data_nascimento')
+
+    class Meta:
+        model = models.Matricula
+        fields = [
+            'uid',
+            'aluno_uid',
+            'nome',
+            'data_nascimento'
+        ]
+
 class PresencaSerializer(serializers.ModelSerializer):
     aluno_uid = serializers.UUIDField()
 

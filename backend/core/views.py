@@ -1,7 +1,11 @@
 from rest_framework.decorators import action
 from rest_framework.exceptions import ParseError
 from rest_framework.generics import get_object_or_404
-from rest_framework.mixins import CreateModelMixin, ListModelMixin
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+)
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
@@ -154,10 +158,15 @@ class AulaViewSet(ModelViewSet):
 
         return models.Aula.objects.filter(periodo_id=periodo.id)
 
-class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
+class MatriculaViewSet(
+    CreateModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+    GenericViewSet
+):
     def get_serializer_class(self):
         if self.action == 'list':
-            return serializers.AlunoSerializer
+            return serializers.ReadMatriculaSerializer
 
         return serializers.MatriculaSerializer
 
@@ -189,15 +198,15 @@ class MatriculaViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
             igreja_id=igreja_id
         )
 
-        return models.Aluno.objects.filter(
-            matricula__classe_id=classe.id,
-            matricula__periodo_id=periodo.id
+        return models.Matricula.objects.filter(
+            classe_id=classe.id,
+            periodo_id=periodo.id
         )
     
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
 
-        return Response({ 'alunos': response.data })
+        return Response({ 'matriculas': response.data })
 
 class DiarioViewSet(CreateModelMixin, GenericViewSet):
     serializer_class = serializers.DiarioSerializer
