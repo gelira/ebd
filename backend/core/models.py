@@ -129,3 +129,6 @@ class Presenca(BaseModel):
     aluno = models.ForeignKey(Aluno, on_delete=models.PROTECT)
     diario = models.ForeignKey(Diario, on_delete=models.PROTECT)
     presenca = models.CharField(choices=PRESENCA_CHOICES)
+
+    class Meta:
+        ordering = ['aluno__nome']
