@@ -257,7 +257,12 @@ class DiarioViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
                 'classe_id': classe.id
             })
 
-        return models.Diario.objects.filter(**filter_dict)
+        qs = models.Diario.objects.filter(**filter_dict)
+        qs = qs.select_related('aula__periodo', 'classe__congregacao')
+        qs = qs.prefetch_related('presenca_set__aluno')
+
+        return qs
+
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
