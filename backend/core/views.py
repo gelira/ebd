@@ -207,8 +207,8 @@ class MatriculaViewSet(
         return models.Matricula.objects.filter(
             classe_id=classe.id,
             periodo_id=periodo.id
-        )
-    
+        ).select_related('aluno')
+
     def create(self, request, *args, **kwargs):
         super().create(request, *args, **kwargs)
 
