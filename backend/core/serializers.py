@@ -185,7 +185,7 @@ class ReadPresencaSerializer(serializers.ModelSerializer):
         model = models.Presenca
         fields = ['aluno_uid', 'nome', 'presenca']
 
-class DiarioSerializer(serializers.ModelSerializer):
+class CreateDiarioSerializer(serializers.ModelSerializer):
     aula_uid = serializers.UUIDField(write_only=True)
     classe_uid = serializers.UUIDField(write_only=True)
     presencas = serializers.ListField(
@@ -373,3 +373,11 @@ class ReadDiarioSerializer(serializers.ModelSerializer):
             'ofertas',
             'dizimos'
         ]
+        extra_kwargs = {
+            'ofertas': {
+                'coerce_to_string': False
+            },
+            'dizimos': {
+                'coerce_to_string': False
+            }
+        }

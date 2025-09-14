@@ -224,7 +224,7 @@ class DiarioViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
         if self.action == 'list':
             return serializers.ReadDiarioSerializer
 
-        return serializers.DiarioSerializer
+        return serializers.CreateDiarioSerializer
     
     def get_queryset(self):
         aula_uid = validate_uuid(self.request.query_params.get('aula_uid'))
@@ -262,7 +262,6 @@ class DiarioViewSet(CreateModelMixin, ListModelMixin, GenericViewSet):
         qs = qs.prefetch_related('presenca_set__aluno')
 
         return qs
-
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
