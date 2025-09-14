@@ -53,7 +53,7 @@ class MatriculaTeste(TestCase):
 
         response = MatriculaViewSet.as_view({ 'post': 'create' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_matricula_with_invalid_classe_uid(self):
         request = self.factory.post(
@@ -70,7 +70,7 @@ class MatriculaTeste(TestCase):
 
         response = MatriculaViewSet.as_view({ 'post': 'create' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_matricula_with_invalid_periodo_uid(self):
         request = self.factory.post(
@@ -87,7 +87,7 @@ class MatriculaTeste(TestCase):
 
         response = MatriculaViewSet.as_view({ 'post': 'create' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_matricula_for_aluno_already_matriculated_in_period(self):
         request1 = self.factory.post(
@@ -104,7 +104,7 @@ class MatriculaTeste(TestCase):
 
         response1 = MatriculaViewSet.as_view({ 'post': 'create' })(request1)
 
-        self.assertEquals(response1.status_code, 204)
+        self.assertEqual(response1.status_code, 204)
 
         request2 = self.factory.post(
             '/api/matriculas',
@@ -120,7 +120,7 @@ class MatriculaTeste(TestCase):
 
         response2 = MatriculaViewSet.as_view({ 'post': 'create' })(request2)
 
-        self.assertEquals(response2.status_code, 400)
+        self.assertEqual(response2.status_code, 400)
 
         request3 = self.factory.post(
             '/api/matriculas',
@@ -136,7 +136,7 @@ class MatriculaTeste(TestCase):
 
         response3 = MatriculaViewSet.as_view({ 'post': 'create' })(request3)
 
-        self.assertEquals(response3.status_code, 400)
+        self.assertEqual(response3.status_code, 400)
 
     def test_create_2_matriculas_to_same_classe_and_list_them(self):
         request1 = self.factory.post(
@@ -153,7 +153,7 @@ class MatriculaTeste(TestCase):
 
         response1 = MatriculaViewSet.as_view({ 'post': 'create' })(request1)
 
-        self.assertEquals(response1.status_code, 204)
+        self.assertEqual(response1.status_code, 204)
 
         request2 = self.factory.post(
             '/api/matriculas',
@@ -169,7 +169,7 @@ class MatriculaTeste(TestCase):
 
         response2 = MatriculaViewSet.as_view({ 'post': 'create' })(request2)
 
-        self.assertEquals(response2.status_code, 204)
+        self.assertEqual(response2.status_code, 204)
 
         request3 = self.factory.get(
             f'/api/matriculas?classe_uid={self.classe1.uid}&periodo_uid={self.periodo.uid}'
@@ -179,8 +179,8 @@ class MatriculaTeste(TestCase):
 
         response3 = MatriculaViewSet.as_view({ 'get': 'list' })(request3)
 
-        self.assertEquals(response3.status_code, 200)
-        self.assertEquals(len(response3.data['matriculas']), 2)
+        self.assertEqual(response3.status_code, 200)
+        self.assertEqual(len(response3.data['matriculas']), 2)
 
     def test_list_matriculas_with_invalid_classe_uid(self):
         request = self.factory.get(
@@ -191,7 +191,7 @@ class MatriculaTeste(TestCase):
 
         response = MatriculaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_list_matriculas_with_invalid_periodo_uid(self):
         request = self.factory.get(
@@ -202,4 +202,4 @@ class MatriculaTeste(TestCase):
 
         response = MatriculaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)

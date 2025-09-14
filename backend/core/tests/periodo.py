@@ -39,8 +39,8 @@ class PeriodoTeste(TestCase):
 
         response = PeriodoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['periodos']), 4)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['periodos']), 4)
 
     def test_list_periodos_by_ano_2026(self):
         request = self.factory.get('/api/periodos?ano=2026')
@@ -49,5 +49,5 @@ class PeriodoTeste(TestCase):
 
         response = PeriodoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['periodos']), 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['periodos']), 1)

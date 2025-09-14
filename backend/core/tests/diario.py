@@ -90,7 +90,7 @@ class DiarioTeste(TestCase):
 
         response = DiarioViewSet.as_view({ 'post': 'create' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_diario_with_less_presences_than_matriculated_students(self):
         request = self.factory.post(
@@ -118,7 +118,7 @@ class DiarioTeste(TestCase):
 
         response = DiarioViewSet.as_view({ 'post': 'create' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_diario_and_check_created_diario(self):
         request1 = self.factory.post(
@@ -147,7 +147,7 @@ class DiarioTeste(TestCase):
 
         response1 = DiarioViewSet.as_view({ 'post': 'create' })(request1)
 
-        self.assertEquals(response1.status_code, 204)
+        self.assertEqual(response1.status_code, 204)
 
         request2 = self.factory.get(
             f'/api/diarios?aula_uid={self.aula.uid}&classe_uid={self.classe1.uid}'
@@ -157,16 +157,16 @@ class DiarioTeste(TestCase):
 
         response2 = DiarioViewSet.as_view({ 'get': 'list' })(request2)
 
-        self.assertEquals(response2.status_code, 200)
-        self.assertEquals(len(response2.data['diarios']), 1)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(len(response2.data['diarios']), 1)
 
         diario = response2.data['diarios'][0]
 
-        self.assertEquals(diario['aula']['uid'], str(self.aula.uid))
-        self.assertEquals(diario['classe']['uid'], str(self.classe1.uid))
-        self.assertEquals(len(diario['presencas']), 5)
-        self.assertEquals(diario['quantidade_presentes'], 4)
-        self.assertEquals(diario['quantidade_ausentes'], 1)
+        self.assertEqual(diario['aula']['uid'], str(self.aula.uid))
+        self.assertEqual(diario['classe']['uid'], str(self.classe1.uid))
+        self.assertEqual(len(diario['presencas']), 5)
+        self.assertEqual(diario['quantidade_presentes'], 4)
+        self.assertEqual(diario['quantidade_ausentes'], 1)
 
     def test_create_diarios_for_both_classes_and_list_them(self):
         request1 = self.factory.post(
@@ -195,7 +195,7 @@ class DiarioTeste(TestCase):
 
         response1 = DiarioViewSet.as_view({ 'post': 'create' })(request1)
 
-        self.assertEquals(response1.status_code, 204)
+        self.assertEqual(response1.status_code, 204)
 
         request2 = self.factory.post(
             '/api/diarios',
@@ -222,7 +222,7 @@ class DiarioTeste(TestCase):
 
         response2 = DiarioViewSet.as_view({ 'post': 'create' })(request2)
 
-        self.assertEquals(response2.status_code, 204)
+        self.assertEqual(response2.status_code, 204)
 
         request3 = self.factory.get(
             f'/api/diarios?aula_uid={self.aula.uid}'
@@ -232,5 +232,5 @@ class DiarioTeste(TestCase):
 
         response3 = DiarioViewSet.as_view({ 'get': 'list' })(request3)
 
-        self.assertEquals(response3.status_code, 200)
-        self.assertEquals(len(response3.data['diarios']), 2)
+        self.assertEqual(response3.status_code, 200)
+        self.assertEqual(len(response3.data['diarios']), 2)

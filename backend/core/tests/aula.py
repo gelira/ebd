@@ -43,8 +43,8 @@ class AulaTeste(TestCase):
 
         response = AulaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['aulas']), 5)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['aulas']), 5)
 
     def test_list_aulas_by_periodo_uid_2(self):
         request = self.factory.get(f'/api/aulas?periodo_uid={self.periodo2.uid}')
@@ -53,8 +53,8 @@ class AulaTeste(TestCase):
 
         response = AulaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['aulas']), 4)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['aulas']), 4)
 
     def test_list_aulas_without_periodo_uid(self):
         request = self.factory.get('/api/aulas')
@@ -63,7 +63,7 @@ class AulaTeste(TestCase):
 
         response = AulaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 400)
+        self.assertEqual(response.status_code, 400)
 
     def test_list_aulas_with_invalid_periodo_uid(self):
         request = self.factory.get(f'/api/aulas?periodo_uid={uuid4()}')
@@ -72,4 +72,4 @@ class AulaTeste(TestCase):
 
         response = AulaViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)

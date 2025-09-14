@@ -48,8 +48,8 @@ class AlunoTeste(TestCase):
 
         response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['alunos']), 4)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['alunos']), 4)
 
     def test_list_alunos_filtered_by_name(self):
         request = self.factory.get('/api/alunos?nome=ari')
@@ -58,8 +58,8 @@ class AlunoTeste(TestCase):
 
         response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['alunos']), 1)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['alunos']), 1)
 
     def test_list_nao_matriculados_sem_periodo_uid(self):
         request = self.factory.get(f'/api/alunos?sem_matricula_periodo_uid={uuid4()}')
@@ -68,7 +68,7 @@ class AlunoTeste(TestCase):
 
         response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 404)
+        self.assertEqual(response.status_code, 404)
 
     def test_list_nao_matriculados_com_periodo_uid(self):
         request = self.factory.get(f'/api/alunos?sem_matricula_periodo_uid={self.periodo.uid}')
@@ -77,6 +77,6 @@ class AlunoTeste(TestCase):
 
         response = AlunoViewSet.as_view({ 'get': 'list' })(request)
 
-        self.assertEquals(response.status_code, 200)
-        self.assertEquals(len(response.data['alunos']), 3)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['alunos']), 3)
 
