@@ -13,6 +13,7 @@ router.register(r'congregacoes', views.CongregacaoViewSet, basename='congregacoe
 router.register(r'diarios', views.DiarioViewSet, basename='diarios')
 router.register(r'matriculas', views.MatriculaViewSet, basename='matriculas')
 router.register(r'periodos', views.PeriodoViewSet, basename='periodos')
+router.register(r'user', views.UsuarioViewSet, basename='usuarios')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

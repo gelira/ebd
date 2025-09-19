@@ -33,6 +33,14 @@ class AuthCodeViewSet(CreateModelMixin, GenericViewSet):
     def verify(self, request):
         return self.create(request)
 
+class UsuarioViewSet(GenericViewSet):
+    def list(self, request, *args, **kwargs):
+        user = request.user
+
+        ser = serializers.UsuarioSerializer(user)
+
+        return Response(ser.data)
+
 class AlunoViewSet(ModelViewSet):
     lookup_field = 'uid'
     lookup_value_converter = 'uuid'

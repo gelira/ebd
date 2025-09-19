@@ -27,6 +27,18 @@ class LoginSerializer(serializers.Serializer):
 
         return self.instance
 
+class UsuarioSerializer(serializers.ModelSerializer):
+    nome_igreja = serializers.CharField(source='igreja.nome', read_only=True)
+
+    class Meta:
+        model = models.Usuario
+        fields = [
+            'nome',
+            'email',
+            'role',
+            'nome_igreja'
+        ]
+
 class AuthCodeVerifySerializer(serializers.Serializer):
     auth_code_uid = serializers.UUIDField(write_only=True)
     code = serializers.CharField(max_length=6, write_only=True)
