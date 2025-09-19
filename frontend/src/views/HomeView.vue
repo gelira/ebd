@@ -1,5 +1,13 @@
 <script setup lang="ts">
 import AppBar from '@/components/AppBar.vue'
+import { useUsuarioStore } from '@/stores/usuario'
+import { onMounted } from 'vue'
+
+const usuarioStore = useUsuarioStore()
+
+onMounted(() => {
+  usuarioStore.fetchUserInfo()
+})
 </script>
 
 <template>

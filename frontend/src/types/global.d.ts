@@ -1,4 +1,11 @@
 declare global {
+  interface UserInfo {
+    nome: string
+    email: string
+    role: string
+    nome_igreja: string
+  }
+  
   interface Aluno {
     uid: string
     nome: string
@@ -23,4 +30,5 @@ declare global {
   }
 }
 
-export {}
+export { }
+
