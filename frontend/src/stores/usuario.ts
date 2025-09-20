@@ -1,4 +1,5 @@
 import { apiGetUserInfo } from '@/api/usuario'
+import { removeToken } from '@/utils/localStorage'
 import { defineStore } from 'pinia'
 import { computed, reactive } from 'vue'
 
@@ -25,6 +26,8 @@ export const useUsuarioStore = defineStore('usuario', () => {
       state.role = data.role
       state.nome_igreja = data.nome_igreja
     } catch (e) {
+      removeToken()
+
       state.nome = ''
       state.email = ''
       state.role = ''
