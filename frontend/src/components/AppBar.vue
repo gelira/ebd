@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useUsuarioStore } from '@/stores/usuario'
 import { ref } from 'vue'
+
+const usuarioStore = useUsuarioStore()
 
 const drawerOpen = ref(false)
 
@@ -19,7 +22,7 @@ function toggle() {
   <v-navigation-drawer v-model="drawerOpen" temporary>
     <v-list>
       <v-list-item>
-        Geraldo Eloi
+        {{ usuarioStore.nome }}
       </v-list-item>
 
       <v-divider></v-divider>
