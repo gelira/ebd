@@ -24,7 +24,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const { data } = await apiPostVerifyAuthCode({
-      auth_code_uid: state.authCodeUid,
+      authCodeUid: state.authCodeUid,
       code
     })
     
