@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from './views/HomeView.vue'
+import LoginView from './views/LoginView.vue'
 
 type RouteKey = 'HOME' | 'LOGIN' | 'TICKETS' | 'NEW_ORDER' | 'CONSUME'
 
@@ -39,6 +40,11 @@ const router = createRouter({
       name: ROUTES.HOME.name,
       component: HomeView,
     },
+    {
+      path: '/login',
+      name: ROUTES.LOGIN.name,
+      component: LoginView,
+    }
   ],
 })
 
