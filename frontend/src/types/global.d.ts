@@ -12,6 +12,18 @@ declare global {
     data_nascimento: string | null
   }
 
+  interface AlunoMatricula {
+    aluno_uid: string
+    nome: string
+    data_nascimento: string | null
+  }
+
+  interface CreateMatricula {
+    alunoUid: string
+    classeUid: string
+    periodoUid: string
+  }
+
   interface Classe {
     uid: string
     nome: string
