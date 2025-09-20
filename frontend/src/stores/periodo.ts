@@ -1,32 +1,30 @@
-import { computed, reactive } from 'vue'
-import { defineStore } from 'pinia'
 import { apiGetPeriodos } from '@/api/periodo'
+import { defineStore } from 'pinia'
+import { computed, reactive } from 'vue'
 
 interface State {
-  congregacaoId: string
   periodos: Periodo[]
 }
 
 export const usePeriodoStore = defineStore('periodo', () => {
   const state = reactive<State>({
-    congregacaoId: '',
     periodos: []
   })
 
   const periodos = computed(() => state.periodos)
-  const congregacaoId = computed(() => state.congregacaoId)
+  const periodoAtual = computed(() => state.periodos.find(p => !p.concluido))
 
-  function fetchPeriodos(congregacaoId: string) {
-    apiGetPeriodos(congregacaoId)
+  function fetchPeriodos() {
+    const ano = new Date().getFullYear().toString()
+
+    apiGetPeriodos(ano)
       .then((response) => {
         state.periodos = response.data.periodos
-        state.congregacaoId = congregacaoId
       })
       .catch(() => {
         state.periodos = []
-        state.congregacaoId = ''
       })
   }
 
-  return { periodos, congregacaoId, fetchPeriodos }
+  return { periodos, periodoAtual, fetchPeriodos }
 })
