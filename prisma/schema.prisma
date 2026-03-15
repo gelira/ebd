@@ -11,3 +11,51 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRole {
+  SUPERINTENDENT @map("superintendent")
+  SECRETARY      @map("secretary")
+  TEACHER        @map("teacher")
+
+  @@map("user_roles_enum")
+}
+
+model Church {
+  id        BigInt   @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  users User[]
+
+  @@map("churches")
+}
+
+model User {
+  id        BigInt   @id @default(autoincrement())
+  churchId  BigInt   @map("church_id")
+  name      String   @db.VarChar(200)
+  email     String   @db.VarChar(200)
+  role      UserRole
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  church    Church     @relation(fields: [churchId], references: [id])
+  authCodes AuthCode[]
+
+  @@map("users")
+}
+
+model AuthCode {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  code      String   @db.VarChar(50)
+  isActive  Boolean  @default(true) @map("is_active")
+  expiredAt DateTime @map("expired_at") @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("auth_codes")
+}
