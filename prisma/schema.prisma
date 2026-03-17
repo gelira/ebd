@@ -11,3 +11,230 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRoleEnum {
+  SUPERINTENDENT @map("superintendent")
+  SECRETARY      @map("secretary")
+  TEACHER        @map("teacher")
+
+  @@map("user_roles_enum")
+}
+
+enum EnrollmentTypeEnum {
+  STUDENT @map("student")
+  TEACHER @map("teacher")
+
+  @@map("enrollment_types_enum")
+}
+
+enum AttendanceTypeEnum {
+  PRESENT          @map("present")
+  ABSENT           @map("absent")
+  JUSTIFIED_ABSENT @map("justified_absent")
+
+  @@map("attendance_types_enum")
+}
+
+model Church {
+  id        BigInt   @id @default(autoincrement())
+  name      String   @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  users         User[]
+  congregations Congregation[]
+  persons       Person[]
+  terms         Term[]
+
+  @@map("churches")
+}
+
+model User {
+  id        BigInt       @id @default(autoincrement())
+  churchId  BigInt       @map("church_id")
+  name      String       @db.VarChar(200)
+  email     String       @db.VarChar(200)
+  role      UserRoleEnum
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  church Church @relation(fields: [churchId], references: [id])
+
+  authCodes         AuthCode[]
+  userCongregations UserCongregation[]
+  userClassrooms    UserClassroom[]
+
+  @@map("users")
+}
+
+model AuthCode {
+  id        BigInt   @id @default(autoincrement())
+  userId    BigInt   @map("user_id")
+  code      String   @db.VarChar(50)
+  isActive  Boolean  @default(true) @map("is_active")
+  expiredAt DateTime @map("expired_at") @db.Timestamptz(3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("auth_codes")
+}
+
+model Congregation {
+  id        BigInt   @id @default(autoincrement())
+  churchId  BigInt   @map("church_id")
+  name      String   @db.VarChar(200)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  church Church @relation(fields: [churchId], references: [id])
+
+  classrooms        Classroom[]
+  usersCongregation UserCongregation[]
+
+  @@map("congregations")
+}
+
+model UserCongregation {
+  id             BigInt   @id @default(autoincrement())
+  userId         BigInt   @map("user_id")
+  congregationId BigInt   @map("congregation_id")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user         User         @relation(fields: [userId], references: [id])
+  congregation Congregation @relation(fields: [congregationId], references: [id])
+
+  @@map("users_congregations")
+}
+
+model Person {
+  id           BigInt   @id @default(autoincrement())
+  churchId     BigInt   @map("church_id")
+  completeName String   @map("complete_name")
+  birthDate    DateTime @map("birth_date") @db.Date
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  church Church @relation(fields: [churchId], references: [id])
+
+  enrollments Enrollment[]
+  attendances Attendance[]
+
+  @@map("persons")
+}
+
+model Classroom {
+  id             BigInt   @id @default(autoincrement())
+  congregationId BigInt   @map("congregation_id")
+  name           String   @db.VarChar(200)
+  keepOfferings  Boolean  @default(false) @map("keep_offerings")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  congregation Congregation @relation(fields: [congregationId], references: [id])
+
+  usersClassroom UserClassroom[]
+  enrollments    Enrollment[]
+  lessonReports  LessonReport[]
+
+  @@map("classrooms")
+}
+
+model UserClassroom {
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  classroomId BigInt   @map("classroom_id")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  user      User      @relation(fields: [userId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+
+  @@map("users_classrooms")
+}
+
+model Term {
+  id        BigInt   @id @default(autoincrement())
+  churchId  BigInt   @map("church_id")
+  termName  String   @map("term_name") @db.VarChar(100)
+  year      String   @db.VarChar(50)
+  completed Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  church Church @relation(fields: [churchId], references: [id])
+
+  lessons     Lesson[]
+  enrollments Enrollment[]
+
+  @@map("terms")
+}
+
+model Lesson {
+  id           BigInt   @id @default(autoincrement())
+  termId       BigInt   @map("term_id")
+  lessonName   String   @map("lesson_name") @db.VarChar(100)
+  expectedDate DateTime @map("expected_date") @db.Date
+  completed    Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  term Term @relation(fields: [termId], references: [id])
+
+  lessonReports LessonReport[]
+
+  @@map("lessons")
+}
+
+model Enrollment {
+  id             BigInt             @id @default(autoincrement())
+  personId       BigInt             @map("person_id")
+  classroomId    BigInt             @map("classroom_id")
+  termId         BigInt             @map("term_id")
+  enrollmentType EnrollmentTypeEnum @map("enrollment_type")
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  person    Person    @relation(fields: [personId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+  term      Term      @relation(fields: [termId], references: [id])
+
+  @@map("enrollments")
+}
+
+model LessonReport {
+  id                BigInt   @id @default(autoincrement())
+  lessonId          BigInt   @map("lesson_id")
+  classroomId       BigInt   @map("classroom_id")
+  lessonDate        DateTime @map("lesson_date") @db.Date
+  attendanceAmount  Int      @map("attendance_amount")
+  absenceAmount     Int      @map("absence_amount")
+  visitorsAmount    Int      @map("visitors_amount")
+  holyBiblesAmount  Int      @map("holy_bibles_amount")
+  lessonBooksAmount Int      @map("lesson_books_amount")
+  offeringTotal     Float    @map("offering_total")
+  titheTotal        Float    @map("tithe_total")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  lesson    Lesson    @relation(fields: [lessonId], references: [id])
+  classroom Classroom @relation(fields: [classroomId], references: [id])
+
+  attendances Attendance[]
+
+  @@map("lesson_reports")
+}
+
+model Attendance {
+  id             BigInt             @id @default(autoincrement())
+  personId       BigInt             @map("person_id")
+  lessonReportId BigInt             @map("lesson_report_id")
+  attendance     AttendanceTypeEnum
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+
+  person       Person       @relation(fields: [personId], references: [id])
+  lessonReport LessonReport @relation(fields: [lessonReportId], references: [id])
+
+  @@map("attendances")
+}
