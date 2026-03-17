@@ -53,7 +53,7 @@ model User {
   id        BigInt       @id @default(autoincrement())
   churchId  BigInt       @map("church_id")
   name      String       @db.VarChar(200)
-  email     String       @db.VarChar(200)
+  email     String       @unique @db.VarChar(200)
   role      UserRoleEnum
   createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
