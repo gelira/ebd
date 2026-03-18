@@ -27,3 +27,36 @@ export async function generateAuthCode({ email }: { email: string }) {
 
   return authCode
 }
+
+export async function validateAuthCode({ authCodeId, code }: { authCodeId: number, code: string }) {
+  const authCode = await db.authCode.findFirst({
+    where: {
+      id: authCodeId,
+      code,
+      isActive: true,
+      expiredAt: {
+        gte: new Date(),
+      },
+    },
+    include: {
+      user: true,
+    },
+  })
+
+  if (!authCode) {
+    throw new CustomError('Invalid code', 401)
+  }
+
+  return authCode
+}
+
+export async function deactivateAuthCode({ authCodeId }: { authCodeId: number }) {
+  await db.authCode.update({
+    where: {
+      id: authCodeId,
+    },
+    data: {
+      isActive: false,
+    },
+  })
+}
