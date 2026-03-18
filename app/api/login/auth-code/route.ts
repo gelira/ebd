@@ -1,6 +1,7 @@
 import { deactivateAuthCode, generateAuthCode, validateAuthCode } from '@/app/_lib/services/auth-code'
 import { CustomError, responseHandlingCustomError } from '@/app/_lib/utils/custom-error'
-import { generateToken } from '@/app/_lib/utils/token'
+import { generateToken, JWT_EXPIRES_IN, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/token'
+import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 import { z } from 'zod'
 
@@ -52,6 +53,16 @@ export async function POST(request: NextRequest) {
     const token = generateToken({ userId, userRole })
 
     await deactivateAuthCode({ authCodeId })
+
+    const cookieStore = await cookies();
+
+    cookieStore.set(AUTH_TOKEN_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: JWT_EXPIRES_IN,
+    });
 
     return Response.json({ token }, {
       status: 200
