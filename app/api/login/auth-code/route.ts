@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 const Schema = z.object({
   authCodeId: z.int(),
-  code: z.string().min(6).max(6),
+  code: z.string().trim().min(6).max(6),
 })
 
 function validateBody(body: any) {
