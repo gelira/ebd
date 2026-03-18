@@ -1,13 +1,52 @@
 -- CreateEnum
+CREATE TYPE "user_roles_enum" AS ENUM ('superintendent', 'secretary', 'teacher');
+
+-- CreateEnum
 CREATE TYPE "enrollment_types_enum" AS ENUM ('student', 'teacher');
 
 -- CreateEnum
 CREATE TYPE "attendance_types_enum" AS ENUM ('present', 'absent', 'justified_absent');
 
 -- CreateTable
+CREATE TABLE "churches" (
+    "id" SERIAL NOT NULL,
+    "name" VARCHAR(200) NOT NULL,
+    "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "churches_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL,
+    "church_id" INTEGER NOT NULL,
+    "name" VARCHAR(200) NOT NULL,
+    "email" VARCHAR(200) NOT NULL,
+    "role" "user_roles_enum" NOT NULL,
+    "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "auth_codes" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "code" VARCHAR(50) NOT NULL,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    "expired_at" TIMESTAMPTZ(3) NOT NULL,
+    "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMPTZ(3) NOT NULL,
+
+    CONSTRAINT "auth_codes_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "congregations" (
-    "id" BIGSERIAL NOT NULL,
-    "church_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "church_id" INTEGER NOT NULL,
     "name" VARCHAR(200) NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(3) NOT NULL,
@@ -17,9 +56,9 @@ CREATE TABLE "congregations" (
 
 -- CreateTable
 CREATE TABLE "users_congregations" (
-    "id" BIGSERIAL NOT NULL,
-    "user_id" BIGINT NOT NULL,
-    "congregation_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "congregation_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "users_congregations_pkey" PRIMARY KEY ("id")
@@ -27,8 +66,8 @@ CREATE TABLE "users_congregations" (
 
 -- CreateTable
 CREATE TABLE "persons" (
-    "id" BIGSERIAL NOT NULL,
-    "church_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "church_id" INTEGER NOT NULL,
     "complete_name" TEXT NOT NULL,
     "birth_date" DATE NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -39,8 +78,8 @@ CREATE TABLE "persons" (
 
 -- CreateTable
 CREATE TABLE "classrooms" (
-    "id" BIGSERIAL NOT NULL,
-    "congregation_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "congregation_id" INTEGER NOT NULL,
     "name" VARCHAR(200) NOT NULL,
     "keep_offerings" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -51,9 +90,9 @@ CREATE TABLE "classrooms" (
 
 -- CreateTable
 CREATE TABLE "users_classrooms" (
-    "id" BIGSERIAL NOT NULL,
-    "user_id" BIGINT NOT NULL,
-    "classroom_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "classroom_id" INTEGER NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "users_classrooms_pkey" PRIMARY KEY ("id")
@@ -61,8 +100,8 @@ CREATE TABLE "users_classrooms" (
 
 -- CreateTable
 CREATE TABLE "terms" (
-    "id" BIGSERIAL NOT NULL,
-    "church_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "church_id" INTEGER NOT NULL,
     "term_name" VARCHAR(100) NOT NULL,
     "year" VARCHAR(50) NOT NULL,
     "completed" BOOLEAN NOT NULL DEFAULT false,
@@ -74,8 +113,8 @@ CREATE TABLE "terms" (
 
 -- CreateTable
 CREATE TABLE "lessons" (
-    "id" BIGSERIAL NOT NULL,
-    "term_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "term_id" INTEGER NOT NULL,
     "lesson_name" VARCHAR(100) NOT NULL,
     "expected_date" DATE NOT NULL,
     "completed" BOOLEAN NOT NULL DEFAULT false,
@@ -87,10 +126,10 @@ CREATE TABLE "lessons" (
 
 -- CreateTable
 CREATE TABLE "enrollments" (
-    "id" BIGSERIAL NOT NULL,
-    "person_id" BIGINT NOT NULL,
-    "classroom_id" BIGINT NOT NULL,
-    "term_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "person_id" INTEGER NOT NULL,
+    "classroom_id" INTEGER NOT NULL,
+    "term_id" INTEGER NOT NULL,
     "enrollment_type" "enrollment_types_enum" NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(3) NOT NULL,
@@ -100,9 +139,9 @@ CREATE TABLE "enrollments" (
 
 -- CreateTable
 CREATE TABLE "lesson_reports" (
-    "id" BIGSERIAL NOT NULL,
-    "lesson_id" BIGINT NOT NULL,
-    "classroom_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "lesson_id" INTEGER NOT NULL,
+    "classroom_id" INTEGER NOT NULL,
     "lesson_date" DATE NOT NULL,
     "attendance_amount" INTEGER NOT NULL,
     "absence_amount" INTEGER NOT NULL,
@@ -119,15 +158,24 @@ CREATE TABLE "lesson_reports" (
 
 -- CreateTable
 CREATE TABLE "attendances" (
-    "id" BIGSERIAL NOT NULL,
-    "person_id" BIGINT NOT NULL,
-    "lesson_report_id" BIGINT NOT NULL,
+    "id" SERIAL NOT NULL,
+    "person_id" INTEGER NOT NULL,
+    "lesson_report_id" INTEGER NOT NULL,
     "attendance" "attendance_types_enum" NOT NULL,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(3) NOT NULL,
 
     CONSTRAINT "attendances_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- AddForeignKey
+ALTER TABLE "users" ADD CONSTRAINT "users_church_id_fkey" FOREIGN KEY ("church_id") REFERENCES "churches"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "auth_codes" ADD CONSTRAINT "auth_codes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "congregations" ADD CONSTRAINT "congregations_church_id_fkey" FOREIGN KEY ("church_id") REFERENCES "churches"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

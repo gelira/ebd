@@ -36,7 +36,7 @@ enum AttendanceTypeEnum {
 }
 
 model Church {
-  id        BigInt   @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   name      String   @db.VarChar(200)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -50,8 +50,8 @@ model Church {
 }
 
 model User {
-  id        BigInt       @id @default(autoincrement())
-  churchId  BigInt       @map("church_id")
+  id        Int          @id @default(autoincrement())
+  churchId  Int          @map("church_id")
   name      String       @db.VarChar(200)
   email     String       @unique @db.VarChar(200)
   role      UserRoleEnum
@@ -68,8 +68,8 @@ model User {
 }
 
 model AuthCode {
-  id        BigInt   @id @default(autoincrement())
-  userId    BigInt   @map("user_id")
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
   code      String   @db.VarChar(50)
   isActive  Boolean  @default(true) @map("is_active")
   expiredAt DateTime @map("expired_at") @db.Timestamptz(3)
@@ -82,8 +82,8 @@ model AuthCode {
 }
 
 model Congregation {
-  id        BigInt   @id @default(autoincrement())
-  churchId  BigInt   @map("church_id")
+  id        Int      @id @default(autoincrement())
+  churchId  Int      @map("church_id")
   name      String   @db.VarChar(200)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -97,9 +97,9 @@ model Congregation {
 }
 
 model UserCongregation {
-  id             BigInt   @id @default(autoincrement())
-  userId         BigInt   @map("user_id")
-  congregationId BigInt   @map("congregation_id")
+  id             Int      @id @default(autoincrement())
+  userId         Int      @map("user_id")
+  congregationId Int      @map("congregation_id")
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user         User         @relation(fields: [userId], references: [id])
@@ -109,8 +109,8 @@ model UserCongregation {
 }
 
 model Person {
-  id           BigInt   @id @default(autoincrement())
-  churchId     BigInt   @map("church_id")
+  id           Int      @id @default(autoincrement())
+  churchId     Int      @map("church_id")
   completeName String   @map("complete_name")
   birthDate    DateTime @map("birth_date") @db.Date
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -125,8 +125,8 @@ model Person {
 }
 
 model Classroom {
-  id             BigInt   @id @default(autoincrement())
-  congregationId BigInt   @map("congregation_id")
+  id             Int      @id @default(autoincrement())
+  congregationId Int      @map("congregation_id")
   name           String   @db.VarChar(200)
   keepOfferings  Boolean  @default(false) @map("keep_offerings")
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
@@ -142,9 +142,9 @@ model Classroom {
 }
 
 model UserClassroom {
-  id          BigInt   @id @default(autoincrement())
-  userId      BigInt   @map("user_id")
-  classroomId BigInt   @map("classroom_id")
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  classroomId Int      @map("classroom_id")
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
 
   user      User      @relation(fields: [userId], references: [id])
@@ -154,8 +154,8 @@ model UserClassroom {
 }
 
 model Term {
-  id        BigInt   @id @default(autoincrement())
-  churchId  BigInt   @map("church_id")
+  id        Int      @id @default(autoincrement())
+  churchId  Int      @map("church_id")
   termName  String   @map("term_name") @db.VarChar(100)
   year      String   @db.VarChar(50)
   completed Boolean  @default(false)
@@ -171,8 +171,8 @@ model Term {
 }
 
 model Lesson {
-  id           BigInt   @id @default(autoincrement())
-  termId       BigInt   @map("term_id")
+  id           Int      @id @default(autoincrement())
+  termId       Int      @map("term_id")
   lessonName   String   @map("lesson_name") @db.VarChar(100)
   expectedDate DateTime @map("expected_date") @db.Date
   completed    Boolean  @default(false)
@@ -187,10 +187,10 @@ model Lesson {
 }
 
 model Enrollment {
-  id             BigInt             @id @default(autoincrement())
-  personId       BigInt             @map("person_id")
-  classroomId    BigInt             @map("classroom_id")
-  termId         BigInt             @map("term_id")
+  id             Int                @id @default(autoincrement())
+  personId       Int                @map("person_id")
+  classroomId    Int                @map("classroom_id")
+  termId         Int                @map("term_id")
   enrollmentType EnrollmentTypeEnum @map("enrollment_type")
   createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -203,9 +203,9 @@ model Enrollment {
 }
 
 model LessonReport {
-  id                BigInt   @id @default(autoincrement())
-  lessonId          BigInt   @map("lesson_id")
-  classroomId       BigInt   @map("classroom_id")
+  id                Int      @id @default(autoincrement())
+  lessonId          Int      @map("lesson_id")
+  classroomId       Int      @map("classroom_id")
   lessonDate        DateTime @map("lesson_date") @db.Date
   attendanceAmount  Int      @map("attendance_amount")
   absenceAmount     Int      @map("absence_amount")
@@ -226,9 +226,9 @@ model LessonReport {
 }
 
 model Attendance {
-  id             BigInt             @id @default(autoincrement())
-  personId       BigInt             @map("person_id")
-  lessonReportId BigInt             @map("lesson_report_id")
+  id             Int                @id @default(autoincrement())
+  personId       Int                @map("person_id")
+  lessonReportId Int                @map("lesson_report_id")
   attendance     AttendanceTypeEnum
   createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
