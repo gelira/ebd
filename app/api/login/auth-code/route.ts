@@ -1,6 +1,6 @@
 import { deactivateAuthCode, generateAuthCode, validateAuthCode } from '@/app/_lib/services/auth-code'
 import { CustomError, responseHandlingCustomError } from '@/app/_lib/utils/custom-error'
-import { generateToken, JWT_EXPIRES_IN, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/token'
+import { generateToken, JWT_EXPIRES_IN, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/auth'
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 import { z } from 'zod'

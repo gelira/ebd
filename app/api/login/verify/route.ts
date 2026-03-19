@@ -1,4 +1,4 @@
-import { verifyToken, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/token'
+import { verifyToken, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/auth'
 import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 

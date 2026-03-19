@@ -1,4 +1,6 @@
+import db from '@/app/_lib/db'
 import { sign, verify } from 'jsonwebtoken'
+import { cookies } from 'next/headers'
 
 export const JWT_EXPIRES_IN = 60 * 60 * 8
 export const AUTH_TOKEN_COOKIE_NAME = 'auth_token'
@@ -28,4 +30,27 @@ export function verifyToken(token: string) {
   const decoded = verify(token, secretKey)
 
   return decoded as { userId: number, userRole: string }
+}
+
+export async function getAuthenticatedUser(token?: string) {
+  try {
+    let tokenValue = token
+
+    if (!tokenValue) {
+      const cookiesStore = await cookies()
+
+      tokenValue = cookiesStore.get(AUTH_TOKEN_COOKIE_NAME)?.value ?? ''
+    }
+
+    const { userId } = verifyToken(tokenValue)
+
+    return await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    })
+
+  } catch {
+    return null
+  }
 }
