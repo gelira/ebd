@@ -1,5 +1,7 @@
+import { Login } from '@/app/_components/login'
+
 export default function Page() {
   return (
-    <h1>Login Page</h1>
+    <Login />
   )
 }
