@@ -47,10 +47,7 @@ export async function POST(request: NextRequest) {
 
     const authCode = await validateAuthCode({ authCodeId, code })
 
-    const userId = authCode.userId
-    const userRole = authCode.user.role
-
-    const token = generateToken({ userId, userRole })
+    const token = generateToken({ userId: authCode.userId })
 
     await deactivateAuthCode({ authCodeId })
 

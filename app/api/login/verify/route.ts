@@ -1,24 +1,17 @@
-import { verifyToken, AUTH_TOKEN_COOKIE_NAME } from '@/app/_lib/utils/auth'
-import { cookies } from 'next/headers'
+import { getAuthenticatedUser } from '@/app/_lib/utils/auth'
 import type { NextRequest } from 'next/server'
 
 export async function GET(request: NextRequest) {
   try {
-    let token = request.headers.get('Authorization')
+    const token = request.headers.get('Authorization') || undefined
 
-    if (!token) {
-      const cookieStore = await cookies()
+    const user = await getAuthenticatedUser(token)
 
-      token = cookieStore.get(AUTH_TOKEN_COOKIE_NAME)?.value ?? ''
-    }
-
-    if (!token) {
+    if (!user) {
       throw new Error()
     }
 
-    const { userId, userRole } = verifyToken(token)
-
-    return Response.json({ userId, userRole }, {
+    return Response.json({ userId: user.id }, {
       status: 200
     })
 

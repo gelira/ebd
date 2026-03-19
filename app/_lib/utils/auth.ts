@@ -7,7 +7,7 @@ export const AUTH_TOKEN_COOKIE_NAME = 'auth_token'
 
 const JWT_ALGORITHM = 'HS512'
 
-export function generateToken(payload: { userId: number, userRole: string }) {
+export function generateToken(payload: { userId: number }) {
   const secretKey = process.env.JWT_SECRET_KEY
 
   if (!secretKey) {
@@ -29,7 +29,7 @@ export function verifyToken(token: string) {
 
   const decoded = verify(token, secretKey)
 
-  return decoded as { userId: number, userRole: string }
+  return decoded as { userId: number }
 }
 
 export async function getAuthenticatedUser(token?: string) {
