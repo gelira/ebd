@@ -1,6 +1,7 @@
 import db from '@/app/_lib/db'
 import { sign, verify } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import { cache } from 'react'
 
 export const JWT_EXPIRES_IN = 60 * 60 * 8
 export const AUTH_TOKEN_COOKIE_NAME = 'auth_token'
@@ -54,3 +55,5 @@ export async function getAuthenticatedUser(token?: string) {
     return null
   }
 }
+
+export const getCurrentUser = cache(getAuthenticatedUser)
