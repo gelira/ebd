@@ -1,6 +1,6 @@
 'use client'
 
-import { redirect } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }){
@@ -53,6 +53,7 @@ function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }){
 function SecondStep({ authCodeId }: { authCodeId: number}){
   const [code, setCode] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
+  const router = useRouter()
 
   const handleSubmit = async () => {
     try {
@@ -71,7 +72,7 @@ function SecondStep({ authCodeId }: { authCodeId: number}){
         throw new Error()
       }
 
-      redirect('/')
+      router.push('/')
 
     } catch {
       setErrorMessage('Algo deu errado. Tente novamente.')
