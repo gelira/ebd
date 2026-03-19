@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
       throw new Error()
     }
 
-    const { userId, userRole} = verifyToken(token)
+    const { userId, userRole } = verifyToken(token)
 
-    return Response.json({ userId, userRole}, {
+    return Response.json({ userId, userRole }, {
       status: 200
     })
 
