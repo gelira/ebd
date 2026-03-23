@@ -49,7 +49,7 @@ export function verifyToken(token: string) {
 }
 
 export async function setAuthTokenInCookies(token: string) {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies()
 
   cookieStore.set(AUTH_TOKEN_COOKIE_NAME, token, {
     httpOnly: true,
@@ -57,7 +57,7 @@ export async function setAuthTokenInCookies(token: string) {
     sameSite: 'lax',
     path: '/',
     maxAge: JWT_EXPIRES_IN,
-  });
+  })
 }
 
 export async function getAuthenticatedUser(token?: string) {
