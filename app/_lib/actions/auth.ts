@@ -3,6 +3,7 @@
 import prisma from '@/app/_lib/db/prisma'
 import { deactivateAuthCode, getUserFromValidAuthCode } from '@/app/_lib/db/auth-code'
 import { createAuthCode, generateToken, setAuthTokenInCookies } from '@/app/_lib/services/auth'
+import { sendAuthCode } from '@/app/_lib/utils/mail'
 import { redirect } from 'next/navigation'
 
 export async function generateAuthCode({ email }: { email: string }) {
@@ -15,6 +16,8 @@ export async function generateAuthCode({ email }: { email: string }) {
   }
 
   const authCode = await createAuthCode(user.id)
+
+  sendAuthCode(email, authCode.code)
 
   return { ok: true, authCodeId: authCode.id }
 }
