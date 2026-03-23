@@ -1,4 +1,4 @@
-import { getCurrentUser } from '@/app/_lib/utils/auth'
+import { getCurrentUser } from '@/app/_lib/services/auth'
 
 export default async function Page() {
   const user = await getCurrentUser()

@@ -1,30 +1,33 @@
 'use client'
 
-import { useState } from 'react'
+import { generateAuthCode } from '@/app/_lib/actions/auth'
+import { useState, useTransition } from 'react'
 
-export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }){
+export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }) {
   const [email, setEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const handleSubmit = async () => {
-    const params = new URLSearchParams({
-      email: email.trim(),
-    })
+  const [pending, startTransition] = useTransition()
 
-    try {
-      const response = await fetch(`/api/login/auth-code?${params.toString()}`)
-
-      if (!response.ok) {
-        setErrorMessage('Algo deu errado. Tente novamente.')
-        return
-      }
-
-      const data = await response.json() as { authCodeId: number }
-
-      nextStep(data.authCodeId)
-    } catch {
-      setErrorMessage('Algo deu errado. Tente novamente.')
+  const handleSubmit = () => {
+    if (!email) {
+      setErrorMessage('Insira um email')
+      return
     }
+
+    startTransition(async () => {
+      try {
+        const { ok, authCodeId } = await generateAuthCode({ email })
+
+        if (!ok || !authCodeId) {
+          throw new Error()
+        }
+
+        nextStep(authCodeId)
+      } catch {
+        setErrorMessage('Algo deu errado. Tente novamente.')
+      }
+    })
   }
 
   return (
@@ -44,7 +47,7 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
         />
       </label>
       {errorMessage && <p>{errorMessage}</p>}
-      <button onClick={handleSubmit}>Próximo</button>
+      <button onClick={handleSubmit} disabled={pending}>Próximo</button>
     </div>
   )
 }

@@ -1,35 +1,31 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { validateAuthCode } from '@/app/_lib/actions/auth'
+import { useState, useTransition } from 'react'
 
-export default function SecondStep({ authCodeId }: { authCodeId: number}){
+export default function SecondStep({ authCodeId }: { authCodeId: number }) {
   const [code, setCode] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
-  const router = useRouter()
 
-  const handleSubmit = async () => {
-    try {
-      const response = await fetch('/api/login/auth-code', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          authCodeId,
-          code,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error()
-      }
-
-      router.push('/')
-
-    } catch {
-      setErrorMessage('Algo deu errado. Tente novamente.')
+  const [pending, startTransition] = useTransition()
+  
+  const handleSubmit = () => {
+    if (!code) {
+      setErrorMessage('Insira o código enviado para seu email')
+      return
     }
+
+    startTransition(async () => {
+      try {
+        const { ok } = await validateAuthCode({ authCodeId, code })
+
+        if (!ok) {
+          throw new Error()
+        }
+      } catch {
+        setErrorMessage('Algo deu errado. Tente novamente.')
+      }
+    })
   }
 
   return (
@@ -39,7 +35,7 @@ export default function SecondStep({ authCodeId }: { authCodeId: number}){
         <input
           type="text"
           placeholder="Código"
-          value={code}
+          name="code"
           onChange={
             (e) => {
               setCode(e.target.value)
@@ -49,7 +45,7 @@ export default function SecondStep({ authCodeId }: { authCodeId: number}){
         />
       </label>
       {errorMessage && <p>{errorMessage}</p>}
-      <button onClick={handleSubmit}>Entrar</button>
+      <button onClick={handleSubmit} disabled={pending}>Entrar</button>
     </div>
   )
 }
