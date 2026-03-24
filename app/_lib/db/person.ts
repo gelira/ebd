@@ -3,6 +3,7 @@ import prisma from './prisma'
 export async function getPersons({ churchId }: { churchId: number }) {
   return await prisma.person.findMany({
     where: { churchId },
+    orderBy: { completeName: 'asc' },
   })
 }
 
