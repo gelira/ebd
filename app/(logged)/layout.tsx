@@ -5,7 +5,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const user = await getCurrentUser()
 
   if (!user) {
-    return redirect('/login')
+    redirect('/login')
   }
 
   return (
