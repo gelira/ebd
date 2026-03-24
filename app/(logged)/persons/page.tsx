@@ -23,14 +23,20 @@ export default async function Page() {
   return (
     <div>
       <ul>
-        {persons.map((person) => (
-          <li key={person.id}>
-            <div>
-              <p>{person.completeName}</p>
-              <Link href={`/persons/${person.id}`}>Editar</Link>
-            </div>
-          </li>
-        ))}
+        {persons.map((person) => {
+          const birthDate = person.birthDate
+            ? new Date(person.birthDate).toISOString().split('T')[0]
+            : 'Sem data de nascimento'
+          
+          return (
+            <li key={person.id}>
+              <div>
+                <p>{person.completeName} - {birthDate}</p>
+                <Link href={`/persons/${person.id}`}>Editar</Link>
+              </div>
+            </li>
+          )
+        })}
       </ul> 
       <Link href="/persons/new">Cadastrar nova pessoa</Link>
     </div>
