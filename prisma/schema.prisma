@@ -109,12 +109,12 @@ model UserCongregation {
 }
 
 model Person {
-  id           Int      @id @default(autoincrement())
-  churchId     Int      @map("church_id")
-  completeName String   @map("complete_name")
-  birthDate    DateTime @map("birth_date") @db.Date
-  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  id           Int       @id @default(autoincrement())
+  churchId     Int       @map("church_id")
+  completeName String    @map("complete_name")
+  birthDate    DateTime? @map("birth_date") @db.Date
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
 
   church Church @relation(fields: [churchId], references: [id])
 
