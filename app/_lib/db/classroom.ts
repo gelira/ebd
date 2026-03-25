@@ -52,6 +52,9 @@ export async function getClassroomsByUserId(userId: number) {
         },
       ],
     },
+    include: {
+      congregation: true,
+    },
     orderBy: {
       name: 'asc',
     },

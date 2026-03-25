@@ -1,3 +1,4 @@
+import { Classroom, Congregation } from '@/app/_lib/generated/prisma/client'
 import { getClassroomsOfCurrentUser } from '@/app/_lib/services/classroom'
 import Link from 'next/link'
 
@@ -16,16 +17,38 @@ export default async function Page() {
     )
   }
 
+  const reducedClassrooms = classrooms.reduce<{ congregation: Congregation, classrooms: Classroom[] }[]>(
+    (acc, classroom) => {
+      const item = acc.find((item) => item.congregation.id === classroom.congregationId)
+
+      if (item) {
+        item.classrooms.push(classroom)
+      } else {
+        acc.push({
+          congregation: classroom.congregation,
+          classrooms: [classroom],
+        })
+      }
+
+      return acc
+    },
+    []
+  )
+
   return (
     <div>
       <h1>Classes</h1>
-      {classrooms.map((classroom) => (
-        <div key={classroom.id}>
-          <Link
-            href={`/classroom/${classroom.id}`}
-          >
-            {classroom.name}
-          </Link>
+      {reducedClassrooms.map((item) => (
+        <div key={item.congregation.id}>
+          <h2>{item.congregation.name}</h2>
+          {item.classrooms.map((classroom) => (
+            <Link
+              key={classroom.id}
+              href={`/classroom/${classroom.id}`}
+            >
+              {classroom.name}
+            </Link>
+          ))}
         </div>
       ))}
     </div>
