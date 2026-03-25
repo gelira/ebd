@@ -1,6 +1,7 @@
 import { Classroom, Congregation } from '@/app/_lib/generated/prisma/client'
 import { getClassroomsOfCurrentUser } from '@/app/_lib/services/classroom'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 export default async function Page() {
   const classrooms = await getClassroomsOfCurrentUser()
@@ -15,6 +16,10 @@ export default async function Page() {
         <h1>Você não está em nenhuma classe</h1>
       </div>
     )
+  }
+
+  if (classrooms.length === 1) {
+    redirect(`/classroom/${classrooms[0].id}`)
   }
 
   const reducedClassrooms = classrooms.reduce<{ congregation: Congregation, classrooms: Classroom[] }[]>(

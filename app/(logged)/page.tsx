@@ -1,25 +1,31 @@
-import { getCongregationsByUserId } from '@/app/_lib/db/congregation'
-import { getCurrentUser } from '@/app/_lib/services/auth'
+import { getClassroomsOfCurrentUser } from '@/app/_lib/services/classroom'
+import { getCongregationsOfCurrentUser } from '@/app/_lib/services/congregation'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 export default async function Page() {
-  const user = await getCurrentUser()
+  const congregations = await getCongregationsOfCurrentUser()
 
-  if (!user) {
-    return null
+  if (!congregations?.length) {
+    const classrooms = await getClassroomsOfCurrentUser()
+
+    if (classrooms?.length) {
+      if (classrooms.length === 1) {
+        redirect(`/classroom/${classrooms[0].id}`)
+      } else {
+        redirect('/classroom')
+      }
+    }
   }
 
-  const congregations = await getCongregationsByUserId(user.id)
-
-  if (congregations.length === 1) {
+  if (congregations?.length === 1) {
     redirect(`/congregation/${congregations[0].id}`)
   }
 
   return (
     <div>
-      {congregations.length === 0 ? (
-        <h1>Você não está vinculado a nenhuma congregação</h1>
+      {!congregations?.length ? (
+        <h1>Você não está vinculado a nenhuma congregação ou classe</h1>
       ) : (
         <>
           <h1>Escolha uma congregação</h1>
