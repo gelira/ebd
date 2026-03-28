@@ -1,4 +1,5 @@
 import { getCurrentClassroom } from '@/app/_lib/services/classroom'
+import { getCurrentTerm } from '@/app/_lib/services/term'
 import { notFound } from 'next/navigation'
 
 export default async function Page({ params }: { params: Promise<{ classroomId: string }> }) {
@@ -10,9 +11,16 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
     notFound()
   }
 
+  const currentTerm = await getCurrentTerm()
+
   return (
     <div>
       <h1>{classroom.name}</h1>
+      {currentTerm ? (
+        <h2>{currentTerm.termName} - {currentTerm.year}</h2>
+      ) : (
+        <h2>Não há período atual</h2>
+      )}
     </div>
   )
 }
