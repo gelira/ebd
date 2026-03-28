@@ -1,6 +1,15 @@
 import { getEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
+import { getCurrentTerm } from '@/app/_lib/services/term'
 
-export default async function Enrollments({ termId, classroomId }: { termId: number, classroomId: number }) {
+export default async function Enrollments({ classroomId }: { classroomId: number }) {
+  const term = await getCurrentTerm()
+
+  if (!term) {
+    return null
+  }
+
+  const termId = term.id
+
   const enrollments = await getEnrollmentsByClassroomAndTerm({ termId, classroomId })
 
   const { teachers, students } = enrollments.reduce((acc, curr) => {

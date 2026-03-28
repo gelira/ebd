@@ -20,7 +20,7 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
       {currentTerm ? (
         <>
           <h2>{currentTerm.termName} - {currentTerm.year}</h2>
-          <Enrollments termId={currentTerm.id} classroomId={classroom.id} />
+          <Enrollments classroomId={classroom.id} />
         </>
       ) : (
         <h2>Não há período atual</h2>
