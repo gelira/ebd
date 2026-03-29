@@ -199,6 +199,8 @@ model Enrollment {
   classroom Classroom @relation(fields: [classroomId], references: [id])
   term      Term      @relation(fields: [termId], references: [id])
 
+  @@unique([personId, classroomId, termId])
+
   @@map("enrollments")
 }
 
