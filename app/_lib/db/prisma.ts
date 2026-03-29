@@ -14,7 +14,22 @@ const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
     adapter,
+    log: [
+      {
+        emit: 'event',
+        level: 'query',
+      },
+      'info',
+      'warn',
+      'error'
+    ],
   })
+
+prisma.$on('query' as never, (e: any) => {
+  console.log('Query: ' + e.query);
+  console.log('Params: ' + e.params);
+  console.log('-----------------------------------------------------')
+});
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 

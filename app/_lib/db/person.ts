@@ -12,3 +12,21 @@ export async function getPerson({ id, churchId }: { churchId: number, id: number
     where: { id, churchId },
   })
 }
+
+export async function getPersonsWithoutEnrollments({ churchId, termId, congregationId }: {
+  congregationId: number,
+  churchId: number,
+  termId: number,
+}) {
+  return await prisma.person.findMany({
+    where: {
+      churchId,
+      enrollments: {
+        none: {
+          termId,
+        },
+      },
+    },
+    orderBy: { completeName: 'asc' },
+  })
+}
