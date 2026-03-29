@@ -1,5 +1,6 @@
 import { getEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
 import { getCurrentTerm } from '@/app/_lib/services/term'
+import Link from 'next/link'
 
 export default async function Enrollments({ classroomId }: { classroomId: number }) {
   const term = await getCurrentTerm()
@@ -37,6 +38,9 @@ export default async function Enrollments({ classroomId }: { classroomId: number
         ) : (
           <p>Nenhum professor encontrado</p>
         )}
+        <Link href={`/classroom/${classroomId}/new-teacher`}>
+          Matricular novo professor
+        </Link>
       </div>
       <div>
         <h2>Alunos</h2>
@@ -51,6 +55,9 @@ export default async function Enrollments({ classroomId }: { classroomId: number
         ) : (
           <p>Nenhum aluno encontrado</p>
         )}
+        <Link href={`/classroom/${classroomId}/new-student`}>
+          Matricular novo aluno
+        </Link>
       </div>
     </div>
   )
