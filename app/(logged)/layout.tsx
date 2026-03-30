@@ -10,8 +10,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <main>
-      <h2>EBD - Home</h2>
-      <h3>Olá, {user.name}</h3>
+      <nav className="navbar bg-base-100 px-4 shadow-sm">
+        <h2 className="text-xl">Sistema EBD</h2>
+      </nav>
+      <div className="p-2">
+        <div className="badge badge-neutral">
+          {user.church.name}
+        </div>
+      </div>
       {children}
     </main>
   )
