@@ -76,6 +76,9 @@ export async function getAuthenticatedUser(token?: string) {
       where: {
         id: userId,
       },
+      include: {
+        church: true,
+      },
     })
 
   } catch {
