@@ -9,17 +9,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-          Sistema EBD
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <div className="space-y-6">
-          {children}
-        </div>
+    <div className="flex justify-center items-center px-5 h-screen">
+      <div className="w-full max-w-xs">
+        <h2 className="text-3xl font-bold text-center">Sistema EBD</h2>
+        {children}
       </div>
     </div>
   )

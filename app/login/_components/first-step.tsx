@@ -1,5 +1,6 @@
 'use client'
 
+import InputError from '@/app/_components/input-error'
 import { generateAuthCode } from '@/app/_lib/actions/auth'
 import { useState, useTransition } from 'react'
 
@@ -11,7 +12,7 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
 
   const handleSubmit = () => {
     if (!email) {
-      setErrorMessage('Insira um email')
+      setErrorMessage('Insira seu email')
       return
     }
 
@@ -32,36 +33,34 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
 
   return (
     <>
-      <div>
-        <label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-          Email:
-        </label>
-        <div className="mt-2">
+      <div className="mt-8">
+        <label className="floating-label">
+          <span>Email</span>
           <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+            type="text"
+            placeholder="Email"
+            className={`input input-md ${errorMessage ? 'input-error' : ''}`}
             onChange={
               (e) => {
-                setEmail(e.target.value)
                 setErrorMessage('')
+                setEmail(e.target.value)
               }
             }
+            value={email}
           />
-        </div>
+        </label>
+        <InputError errorMessage={errorMessage} />
       </div>
 
-      <div>
+      <div className="mt-4">
         <button
+          className="btn btn-primary btn-block"
           onClick={handleSubmit}
           disabled={pending}
-          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Enviar código
         </button>
       </div>
-      {errorMessage && <p>{errorMessage}</p>}
     </>
   )
 }
