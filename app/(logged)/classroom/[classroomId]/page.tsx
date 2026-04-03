@@ -15,16 +15,22 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
   const currentTerm = await getCurrentTerm()
 
   return (
-    <div>
-      <h1>{classroom.name}</h1>
-      {currentTerm ? (
-        <>
-          <h2>{currentTerm.termName} - {currentTerm.year}</h2>
-          <Enrollments classroomId={classroom.id} />
-        </>
-      ) : (
-        <h2>Não há período atual</h2>
-      )}
+    <div className="m-4">
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <h2 className="card-title">{classroom.name}</h2>
+          {currentTerm ? (
+            <>
+              <div className="badge badge-neutral badge-outline">
+                {currentTerm.termName} - {currentTerm.year}
+              </div>
+              <Enrollments classroomId={classroom.id} />
+            </>
+          ) : (
+            <h2>Não há período atual</h2>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
