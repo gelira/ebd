@@ -40,23 +40,6 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     await prisma.$transaction(async (tx) => {
       await Promise.all(
         personIdList.map(async (personId) => {
-          if (enrollmentType === 'STUDENT') {
-            const existingEnrollment = await tx.enrollment.findFirst({
-              where: {
-                termId,
-                personId,
-                enrollmentType,
-                classroom: {
-                  congregationId: classroom.congregationId,
-                },
-              },
-            })
-
-            if (existingEnrollment) {
-              throw new Error('Aluno já matriculado em outra classe')
-            }
-          }
-
           return await tx.enrollment.upsert({
             where: {
               personId_classroomId_termId: {
