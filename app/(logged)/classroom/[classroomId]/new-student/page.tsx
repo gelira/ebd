@@ -1,4 +1,4 @@
-import { getPersonsWithoutEnrollments } from '@/app/_lib/db/person'
+import { getPersons } from '@/app/_lib/db/person'
 import { getCurrentClassroom } from '@/app/_lib/services/classroom'
 import { getCurrentTerm } from '@/app/_lib/services/term'
 import { notFound } from 'next/navigation'
@@ -15,25 +15,24 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
 
   const term = await getCurrentTerm()
 
-  const persons = term && await getPersonsWithoutEnrollments({
-    termId: term.id,
-    churchId: term.churchId,
-    congregationId: classroom.congregationId,
-  })
+  const persons = term && await getPersons({ churchId: term.churchId })
 
   return (
-    <div>
-      <h2>Matricular Novo aluno</h2>
-      {term && persons ? (
-        <PersonSelect
-          classroomId={classroom.id}
-          termId={term.id}
-          persons={persons}
-          enrollmentType="STUDENT"
-        />
-      ) : (
-        <h2>Não há período atual</h2>
-      )}
+    <div className="m-4">
+      <div className="card bg-base-100 shadow-xl border border-base-200">
+        <div className="card-body gap-4">
+          <h2 className="card-title text-lg">
+            Matricular Alunos
+          </h2>
+
+          <PersonSelect
+            classroomId={classroom.id}
+            termId={term?.id}
+            persons={persons ?? []}
+            enrollmentType="STUDENT"
+          />
+        </div>
+      </div>
     </div>
   )
 }
