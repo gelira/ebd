@@ -2,6 +2,7 @@
 
 import prisma from '@/app/_lib/db/prisma'
 import { getClassroom } from '@/app/_lib/db/classroom'
+import { getPerson } from '@/app/_lib/db/person'
 import { getCurrentUser } from '@/app/_lib/services/auth'
 import { getTerm } from '@/app/_lib/db/term'
 import { redirect } from 'next/navigation'
@@ -40,6 +41,12 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     await prisma.$transaction(async (tx) => {
       await Promise.all(
         personIdList.map(async (personId) => {
+          const person = await getPerson({ id: personId, churchId: user.churchId })
+
+          if (!person) {
+            throw new Error('Person not found')
+          }
+
           return await tx.enrollment.upsert({
             where: {
               personId_classroomId_termId: {
