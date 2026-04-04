@@ -24,41 +24,72 @@ export default async function Enrollments({ classroomId }: { classroomId: number
   }, { teachers: [] as typeof enrollments, students: [] as typeof enrollments })
 
   return (
-    <div>
-      <div>
-        <h2>Professores</h2>
-        {teachers.length ? (
-          <ul>
-            {teachers.map((teacher) => (
-              <li key={teacher.id}>
-                {teacher.person.completeName}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Nenhum professor encontrado</p>
+    <>
+      <ul className="list bg-base-100 rounded-box shadow-md">
+        
+        <li className="p-4 pb-2">Professores</li>
+
+        {!teachers?.length && (
+          <li className="list-row">
+            <div className="list-col-grow flex items-center">
+              <div>Nenhum professor encontrado</div>
+            </div>
+          </li>
         )}
-        <Link href={`/classroom/${classroomId}/new-teacher`}>
-          Matricular novo professor
-        </Link>
-      </div>
-      <div>
-        <h2>Alunos</h2>
-        {students.length ? (
-          <ul>
-            {students.map((student) => (
-              <li key={student.id}>
-                {student.person.completeName}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Nenhum aluno encontrado</p>
+
+        {teachers?.map((teacher) => (
+          <li className="list-row" key={teacher.id}>
+            <div className="list-col-grow flex items-center">
+              <div>{teacher.person.completeName}</div>
+            </div>
+            <button className="btn btn-square btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+
+            </button>
+          </li>
+        ))}
+
+        <li className="list-row">
+          <Link href={`/classroom/${classroomId}/new-teacher`}>
+            <button className="btn btn-soft btn-primary">Matricular novo professor</button>
+          </Link>
+        </li>
+      </ul>
+
+      <ul className="list bg-base-100 rounded-box shadow-md">
+        
+        <li className="p-4 pb-2">Alunos</li>
+
+        {!students?.length && (
+          <li className="list-row">
+            <div className="list-col-grow flex items-center">
+              <div>Nenhum aluno encontrado</div>
+            </div>
+          </li>
         )}
-        <Link href={`/classroom/${classroomId}/new-student`}>
-          Matricular novo aluno
-        </Link>
-      </div>
-    </div>
+
+        {students?.map((student) => (
+          <li className="list-row" key={student.id}>
+            <div className="list-col-grow flex items-center">
+              <div>{student.person.completeName}</div>
+            </div>
+            <button className="btn btn-square btn-ghost">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+
+            </button>
+          </li>
+        ))}
+
+        <li className="list-row">
+          <Link href={`/classroom/${classroomId}/new-student`}>
+            <button className="btn btn-soft btn-primary">Matricular novo aluno</button>
+          </Link>
+        </li>
+      </ul>
+    </>
   )
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import InputError from '@/app/_components/input-error'
 import { validateAuthCode } from '@/app/_lib/actions/auth'
 import { useState, useTransition } from 'react'
 
@@ -29,23 +30,36 @@ export default function SecondStep({ authCodeId }: { authCodeId: number }) {
   }
 
   return (
-    <div>
-      <label>
-        Insira o código enviado para seu email:
-        <input
-          type="text"
-          placeholder="Código"
-          name="code"
-          onChange={
-            (e) => {
-              setCode(e.target.value)
-              setErrorMessage('')
+    <>
+      <div className="mt-8">
+        <label className="floating-label">
+          <span>Código</span>
+          <input
+            type="text"
+            placeholder="Código"
+            autoComplete="off"
+            className={`input input-md ${errorMessage ? 'input-error' : ''}`}
+            onChange={
+              (e) => {
+                setErrorMessage('')
+                setCode(e.target.value)
+              }
             }
-          }
-        />
-      </label>
-      {errorMessage && <p>{errorMessage}</p>}
-      <button onClick={handleSubmit} disabled={pending}>Entrar</button>
-    </div>
+            value={code}
+          />
+        </label>
+        <InputError errorMessage={errorMessage} />
+      </div>
+
+      <div className="mt-4">
+        <button
+          className="btn btn-success btn-block"
+          onClick={handleSubmit}
+          disabled={pending}
+        >
+          Entrar
+        </button>
+      </div>
+    </>
   )
 }

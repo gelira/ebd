@@ -1,5 +1,6 @@
 'use client'
 
+import InputError from '@/app/_components/input-error'
 import { generateAuthCode } from '@/app/_lib/actions/auth'
 import { useState, useTransition } from 'react'
 
@@ -11,7 +12,7 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
 
   const handleSubmit = () => {
     if (!email) {
-      setErrorMessage('Insira um email')
+      setErrorMessage('Insira seu email')
       return
     }
 
@@ -31,23 +32,35 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
   }
 
   return (
-    <div>
-      <label>
-        Insira seu email:
-        <input
-          type="text"
-          placeholder="Email"
-          value={email}
-          onChange={
-            (e) => {
-              setEmail(e.target.value)
-              setErrorMessage('')
+    <>
+      <div className="mt-8">
+        <label className="floating-label">
+          <span>Email</span>
+          <input
+            type="text"
+            placeholder="Email"
+            className={`input input-md ${errorMessage ? 'input-error' : ''}`}
+            onChange={
+              (e) => {
+                setErrorMessage('')
+                setEmail(e.target.value)
+              }
             }
-          }
-        />
-      </label>
-      {errorMessage && <p>{errorMessage}</p>}
-      <button onClick={handleSubmit} disabled={pending}>Próximo</button>
-    </div>
+            value={email}
+          />
+        </label>
+        <InputError errorMessage={errorMessage} />
+      </div>
+
+      <div className="mt-4">
+        <button
+          className="btn btn-primary btn-block"
+          onClick={handleSubmit}
+          disabled={pending}
+        >
+          Enviar código
+        </button>
+      </div>
+    </>
   )
 }

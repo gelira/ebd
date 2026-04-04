@@ -9,9 +9,11 @@ export default async function Layout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <main>
-      <h2>EBD - Página de Login</h2>
-      {children}
-    </main>
+    <div className="flex justify-center items-center px-5 h-screen">
+      <div className="w-full max-w-xs">
+        <h2 className="text-3xl font-bold text-center">Sistema EBD</h2>
+        {children}
+      </div>
+    </div>
   )
 }
