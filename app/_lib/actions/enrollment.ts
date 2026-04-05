@@ -77,3 +77,35 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
 
   redirect(`/classroom/${classroomId}`)
 }
+
+export async function deleteEnrollment({ enrollmentId }: { enrollmentId: number }) {
+  const user = await getCurrentUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  const enrollment = await prisma.enrollment.findFirst({
+    where: {
+      id: enrollmentId,
+      term: {
+        churchId: user.churchId,
+      },
+    },
+  })
+
+  if (!enrollment) {
+    return {
+      ok: false,
+      message: 'Matrícula não encontrada'
+    }
+  }
+  
+  await prisma.enrollment.delete({
+    where: { id: enrollmentId },
+  })
+
+  return {
+    ok: true
+  }
+}
