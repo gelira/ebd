@@ -18,18 +18,21 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
   const persons = term && await getPersons({ churchId: term.churchId })
 
   return (
-    <div>
-      <h2>Matricular Novo professor</h2>
-      {term && persons ? (
-        <PersonSelect
-          classroomId={classroom.id}
-          termId={term.id}
-          persons={persons}
-          enrollmentType="TEACHER"
-        />
-      ) : (
-        <h2>Não há período atual</h2>
-      )}
+    <div className="m-4">
+      <div className="card bg-base-100 shadow-xl border border-base-200">
+        <div className="card-body gap-4">
+          <h2 className="card-title text-lg">
+            Matricular Professores
+          </h2>
+
+          <PersonSelect
+            classroomId={classroom.id}
+            termId={term?.id}
+            persons={persons ?? []}
+            enrollmentType="TEACHER"
+          />
+        </div>
+      </div>
     </div>
   )
 }

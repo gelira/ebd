@@ -16,3 +16,5 @@ export async function getEnrollmentsByClassroomAndTerm({ classroomId, termId }: 
     },
   })
 }
+
+export type EnrollmentWithPerson = Awaited<ReturnType<typeof getEnrollmentsByClassroomAndTerm>>[number]
