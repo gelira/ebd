@@ -32,7 +32,7 @@ export default function Enrollments(props: {
     <>
       <ul className="list bg-base-100 rounded-box shadow-md">
         
-        <li className="p-4 pb-2 text-md font-bold">Professores</li>
+        <li className="p-4 pb-2 text-md font-bold">Professores {!!teachers.length && `(${teachers.length})`}</li>
 
         {!teachers.length && (
           <li className="list-row">
@@ -67,7 +67,7 @@ export default function Enrollments(props: {
 
       <ul className="list bg-base-100 rounded-box shadow-md">
         
-        <li className="p-4 pb-2 text-md font-bold">Alunos</li>
+        <li className="p-4 pb-2 text-md font-bold">Alunos {!!students.length && `(${students.length})`}</li>
 
         {!students.length && (
           <li className="list-row">
