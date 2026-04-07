@@ -23,20 +23,18 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
   })
 
   return (
-    <div className="m-4">
-      <div className="card bg-base-100 shadow-xl border border-base-200">
-        <div className="card-body gap-4">
-          <h2 className="card-title text-lg">
-            Matricular Professores - {classroom.name}
-          </h2>
+    <div className="card bg-base-100 shadow-xl border border-base-200">
+      <div className="card-body gap-4">
+        <h2 className="card-title text-lg">
+          Matricular Professores - {classroom.name}
+        </h2>
 
-          <PersonSelect
-            classroomId={classroom.id}
-            termId={term?.id}
-            persons={persons ?? []}
-            enrollmentType="TEACHER"
-          />
-        </div>
+        <PersonSelect
+          classroomId={classroom.id}
+          termId={term?.id}
+          persons={persons ?? []}
+          enrollmentType="TEACHER"
+        />
       </div>
     </div>
   )

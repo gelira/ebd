@@ -15,19 +15,17 @@ export default async function Page({ params }: { params: Promise<{ congregationI
   const classrooms = await getClassroomsOfCurrentCongregation(congregation.id)
 
   return (
-    <div className="m-4">
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h2 className="card-title">Classes - {congregation.name}</h2>
-          {classrooms?.map((classroom) => (
-            <Link
-              key={classroom.id}
-              href={`/classroom/${classroom.id}`}
-            >
-              <button className="btn btn-outline w-full">{classroom.name}</button>
-            </Link>
-          ))}
-        </div>
+    <div className="card shadow-sm">
+      <div className="card-body">
+        <h2 className="card-title">Classes - {congregation.name}</h2>
+        {classrooms?.map((classroom) => (
+          <Link
+            key={classroom.id}
+            href={`/classroom/${classroom.id}`}
+          >
+            <button className="btn btn-outline w-full">{classroom.name}</button>
+          </Link>
+        ))}
       </div>
     </div>
   )

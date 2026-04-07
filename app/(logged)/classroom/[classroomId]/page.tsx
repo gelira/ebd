@@ -31,26 +31,24 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
   }, { teachers: [] as typeof enrollments, students: [] as typeof enrollments })
 
   return (
-    <div className="m-4">
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h2 className="card-title">{classroom.name}</h2>
-          {currentTerm ? (
-            <>
-              <div className="badge badge-neutral badge-outline">
-                {currentTerm.termName} - {currentTerm.year}
-              </div>
-              <Enrollments
-                classroomId={classroom.id}
-                classroomName={classroom.name}
-                teachers={teachers}
-                students={students}
-              />
-            </>
-          ) : (
-            <h2>Não há período atual</h2>
-          )}
-        </div>
+    <div className="card shadow-sm">
+      <div className="card-body">
+        <h2 className="card-title">{classroom.name}</h2>
+        {currentTerm ? (
+          <>
+            <div className="badge badge-neutral badge-outline">
+              {currentTerm.termName} - {currentTerm.year}
+            </div>
+            <Enrollments
+              classroomId={classroom.id}
+              classroomName={classroom.name}
+              teachers={teachers}
+              students={students}
+            />
+          </>
+        ) : (
+          <h2>Não há período atual</h2>
+        )}
       </div>
     </div>
   )
