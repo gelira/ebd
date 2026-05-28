@@ -1,7 +1,8 @@
 'use client'
 
 import InputError from '@/app/_components/input-error'
-import { validateAuthCode } from '@/app/_lib/actions/auth'
+import { actionValidateAuthCode } from '@/app/_lib/actions/auth'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
 export default function SecondStep({ authCodeId }: { authCodeId: number }) {
@@ -9,6 +10,8 @@ export default function SecondStep({ authCodeId }: { authCodeId: number }) {
   const [errorMessage, setErrorMessage] = useState('')
 
   const [pending, startTransition] = useTransition()
+
+  const router = useRouter()
   
   const handleSubmit = () => {
     if (!code) {
@@ -18,11 +21,14 @@ export default function SecondStep({ authCodeId }: { authCodeId: number }) {
 
     startTransition(async () => {
       try {
-        const { ok } = await validateAuthCode({ authCodeId, code })
+        const { ok } = await actionValidateAuthCode({ authCodeId, code })
 
         if (!ok) {
           throw new Error()
         }
+
+        router.push('/')
+
       } catch {
         setErrorMessage('Algo deu errado. Tente novamente.')
       }

@@ -1,38 +1,52 @@
 'use server'
 
-import prisma from '@/app/_lib/db/prisma'
-import { deactivateAuthCode, getUserFromValidAuthCode } from '@/app/_lib/db/auth-code'
-import { createAuthCode, generateToken, setAuthTokenInCookies } from '@/app/_lib/services/auth'
+import { dbDeactivateAuthCode, dbGetUserFromValidAuthCode } from '@/app/_lib/db/auth-code'
+import { dbFindUserByEmail } from '@/app/_lib/db/user'
+import {
+  createAuthCode,
+  generateToken,
+  setAuthTokenInCookies
+} from '@/app/_lib/services/auth'
 import { sendAuthCode } from '@/app/_lib/utils/mail'
-import { redirect } from 'next/navigation'
 
-export async function generateAuthCode({ email }: { email: string }) {
-  const user = await prisma.user.findUnique({
-    where: { email },
-  })
+export async function actionGenerateAuthCode({ email }: {
+  email: string
+}) {
+  try {
+    const user = await dbFindUserByEmail({ email })
 
-  if (!user) {
-    return { ok: false }
+    if (!user) {
+      return { ok: false, authCodeId: -1 }
+    }
+
+    const authCode = await createAuthCode(user.id)
+
+    sendAuthCode(email, authCode.code)
+
+    return { ok: true, authCodeId: authCode.id }
+  } catch {
+    return { ok: false, authCodeId: -1 }
   }
-
-  const authCode = await createAuthCode(user.id)
-
-  sendAuthCode(email, authCode.code)
-
-  return { ok: true, authCodeId: authCode.id }
 }
 
-export async function validateAuthCode({ authCodeId, code }: { authCodeId: number, code: string }) {
-  const user = await getUserFromValidAuthCode({ authCodeId, code })
+export async function actionValidateAuthCode({ authCodeId, code }: {
+  authCodeId: number,
+  code: string
+}) {
+  try {
+    const user = await dbGetUserFromValidAuthCode({ authCodeId, code })
 
-  if (!user) {
+    if (!user) {
+      return { ok: false }
+    }
+
+    const token = generateToken({ userId: user.id })
+
+    await dbDeactivateAuthCode({ authCodeId })
+    await setAuthTokenInCookies(token)
+
+    return { ok: true }
+  } catch {
     return { ok: false }
   }
-
-  const token = generateToken({ userId: user.id })
-
-  await setAuthTokenInCookies(token)
-  await deactivateAuthCode({ authCodeId })
-
-  redirect('/')
 }
