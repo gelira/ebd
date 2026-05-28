@@ -1,7 +1,6 @@
 'use server'
 
-import { dbDeactivateAuthCode, dbGetUserFromValidAuthCode } from '@/app/_lib/db/auth-code'
-import { dbFindUserByEmail } from '@/app/_lib/db/user'
+import prisma from '@/app/_lib/db/prisma'
 import {
   createAuthCode,
   generateToken,
@@ -13,7 +12,9 @@ export async function actionGenerateAuthCode({ email }: {
   email: string
 }) {
   try {
-    const user = await dbFindUserByEmail({ email })
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
 
     if (!user) {
       return { ok: false, authCodeId: -1 }
@@ -34,7 +35,21 @@ export async function actionValidateAuthCode({ authCodeId, code }: {
   code: string
 }) {
   try {
-    const user = await dbGetUserFromValidAuthCode({ authCodeId, code })
+    const authCode = await prisma.authCode.findFirst({
+      where: {
+        id: authCodeId,
+        code,
+        isActive: true,
+        expiredAt: {
+          gte: new Date(),
+        },
+      },
+      include: {
+        user: true,
+      },
+    })
+
+    const user = authCode?.user
 
     if (!user) {
       return { ok: false }
@@ -42,7 +57,15 @@ export async function actionValidateAuthCode({ authCodeId, code }: {
 
     const token = generateToken({ userId: user.id })
 
-    await dbDeactivateAuthCode({ authCodeId })
+    await prisma.authCode.update({
+      where: {
+        id: authCodeId,
+      },
+      data: {
+        isActive: false,
+      },
+    })
+
     await setAuthTokenInCookies(token)
 
     return { ok: true }
