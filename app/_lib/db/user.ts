@@ -1,6 +1,10 @@
+import 'server-only'
+
 import prisma from './prisma'
 
-export async function findUserByEmail(email: string) {
+export async function dbFindUserByEmail({ email }: {
+  email: string
+}) {
   return await prisma.user.findUnique({
     where: { email },
   })
