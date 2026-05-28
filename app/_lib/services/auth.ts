@@ -1,3 +1,5 @@
+import 'server-only'
+
 import prisma from '@/app/_lib/db/prisma'
 import { sign, verify } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
