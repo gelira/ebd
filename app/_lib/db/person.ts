@@ -1,6 +1,7 @@
+import 'server-only'
 import prisma from './prisma'
 
-export async function getPersons({ churchId }: { churchId: number }) {
+export async function dbGetPersons({ churchId }: { churchId: number }) {
   return await prisma.person.findMany({
     where: { churchId },
     orderBy: { completeName: 'asc' },
