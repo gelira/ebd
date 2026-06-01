@@ -13,6 +13,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <div className="flex">
       <SideMenu />
       <div>
+        <h2>Bem-vindo, {user.name} - {user.church.name}</h2>
         {children}
       </div>
     </div>
