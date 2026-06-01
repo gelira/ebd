@@ -1,4 +1,4 @@
-import { getPerson } from '@/app/_lib/db/person'
+import { dbGetPerson } from '@/app/_lib/db/person'
 import { getCurrentUser } from '@/app/_lib/services/auth'
 import { notFound } from 'next/navigation'
 
@@ -25,7 +25,7 @@ export default async function Page({ params }: { params: Promise<{ personId: str
       notFound()
     }
 
-    const person = await getPerson({ id: personIdNumber, churchId: user.churchId })
+    const person = await dbGetPerson({ id: personIdNumber, churchId: user.churchId })
 
     if (!person) {
       notFound()

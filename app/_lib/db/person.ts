@@ -8,7 +8,7 @@ export async function dbGetPersons({ churchId }: { churchId: number }) {
   })
 }
 
-export async function getPerson({ id, churchId }: { churchId: number, id: number }) {
+export async function dbGetPerson({ id, churchId }: { churchId: number, id: number }) {
   return await prisma.person.findFirst({
     where: { id, churchId },
   })
