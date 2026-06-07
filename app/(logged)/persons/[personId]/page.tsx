@@ -1,5 +1,6 @@
 import { dbGetPerson } from '@/app/_lib/db/person'
 import { getCurrentUser } from '@/app/_lib/services/auth'
+import { parseIntParam } from '@/app/_lib/utils/params'
 import { notFound } from 'next/navigation'
 
 import PersonForm from './_components/form'
@@ -7,9 +8,7 @@ import PersonForm from './_components/form'
 export default async function Page({ params }: { params: Promise<{ personId: string }> }) {
   const user = await getCurrentUser()
 
-  if (!user) {
-    return null
-  }
+  const churchId = user?.churchId ?? 0
   
   const { personId } = await params
 
@@ -21,11 +20,9 @@ export default async function Page({ params }: { params: Promise<{ personId: str
       return null
     }
 
-    if (isNaN(personIdNumber)) {
-      notFound()
-    }
+    const parsedId = parseIntParam(personId)
 
-    const person = await dbGetPerson({ id: personIdNumber, churchId: user.churchId })
+    const person = await dbGetPerson({ id: parsedId, churchId })
 
     if (!person) {
       notFound()

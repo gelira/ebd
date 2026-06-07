@@ -6,11 +6,9 @@ import PersonItem from './_components/person-item'
 export default async function Page() {
   const user = await getCurrentUser()
 
-  if (!user) {
-    return null
-  }
-
-  const persons = await dbGetPersons({ churchId: user.churchId })
+  const persons = await dbGetPersons({
+    churchId: user?.churchId ?? 0
+  })
 
   return (
     <div>

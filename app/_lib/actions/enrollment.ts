@@ -1,8 +1,8 @@
 'use server'
 
 import prisma from '@/app/_lib/db/prisma'
-import { getClassroom } from '@/app/_lib/db/classroom'
-import { getPerson } from '@/app/_lib/db/person'
+import { dbGetClassroom } from '@/app/_lib/db/classroom'
+import { dbGetPerson } from '@/app/_lib/db/person'
 import { getCurrentUser } from '@/app/_lib/services/auth'
 import { getTerm } from '@/app/_lib/db/term'
 import { redirect } from 'next/navigation'
@@ -28,7 +28,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     }
   }
 
-  const classroom = await getClassroom({ id: classroomId, userId: user.id })
+  const classroom = await dbGetClassroom({ id: classroomId, userId: user.id })
 
   if (!classroom) {
     return {
@@ -41,7 +41,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     await prisma.$transaction(async (tx) => {
       await Promise.all(
         personIdList.map(async (personId) => {
-          const person = await getPerson({ id: personId, churchId: user.churchId })
+          const person = await dbGetPerson({ id: personId, churchId: user.churchId })
 
           if (!person) {
             throw new Error('Person not found')

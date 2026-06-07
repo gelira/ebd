@@ -1,18 +1,29 @@
-import { getClassroomsOfCurrentCongregation } from '@/app/_lib/services/classroom'
-import { getCurrentCongregation } from '@/app/_lib/services/congregation'
+import { dbGetClassroomsByCongregationId } from '@/app/_lib/db/classroom'
+import { dbGetCongregation } from '@/app/_lib/db/congregation'
+import { getCurrentUser } from '@/app/_lib/services/auth'
+import { parseIntParam } from '@/app/_lib/utils/params'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 export default async function Page({ params }: { params: Promise<{ congregationId: string }> }) {
   const { congregationId } = await params
 
-  const congregation = await getCurrentCongregation(Number(congregationId))
+  const parsedId = parseIntParam(congregationId)
+
+  const user = await getCurrentUser()
+
+  const congregation = await dbGetCongregation({
+    id: parsedId,
+    userId: user?.id ?? 0
+  })
 
   if (!congregation) {
     notFound()
   }
 
-  const classrooms = await getClassroomsOfCurrentCongregation(congregation.id)
+  const classrooms = await dbGetClassroomsByCongregationId({
+    congregationId: parsedId,
+  })
 
   return (
     <div className="card shadow-sm">

@@ -1,4 +1,5 @@
-import { getCongregation, getCongregationsByUserId } from '@/app/_lib/db/congregation'
+import 'server-only'
+import { dbGetCongregationsByUserId } from '@/app/_lib/db/congregation'
 import { cache } from 'react'
 import { getCurrentUser } from './auth'
 
@@ -9,15 +10,5 @@ export const getCongregationsOfCurrentUser = cache(async () => {
     return null
   }
 
-  return await getCongregationsByUserId(user.id)
-})
-
-export const getCurrentCongregation = cache(async (id: number) => {
-  const user = await getCurrentUser()
-
-  if (!user || isNaN(id)) {
-    return null
-  }
-
-  return await getCongregation({ id, userId: user.id })
+  return await dbGetCongregationsByUserId({ userId: user.id })
 })
