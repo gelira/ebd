@@ -11,11 +11,16 @@ export default function SideMenu() {
         </li>
         <li>
           <Link href="/persons">
-            Pessoas
+            Lista de pessoas
           </Link>
         </li>
         <li>
-          <Link href="/congregations">
+          <Link href="/persons/new">
+            Cadastrar pessoa
+          </Link>
+        </li>
+        <li>
+          <Link href="/congregation">
             Congregações
           </Link>
         </li>
