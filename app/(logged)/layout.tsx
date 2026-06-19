@@ -11,7 +11,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
   return (
     <div className="flex">
-      <SideMenu />
+      <SideMenu userId={user.id} />
       <div>
         <h2>Bem-vindo, {user.name} - {user.church.name}</h2>
         {children}

@@ -1,6 +1,9 @@
+import { dbGetCongregationsByUserId } from '@/app/_lib/db/congregation'
 import Link from 'next/link'
 
-export default function SideMenu() {
+export default async function SideMenu({ userId }: { userId: number }) {
+  const congregations = await dbGetCongregationsByUserId({ userId })
+
   return (
     <div className="mr-8">
       <ul>
@@ -19,11 +22,13 @@ export default function SideMenu() {
             Cadastrar pessoa
           </Link>
         </li>
-        <li>
-          <Link href="/congregation">
-            Congregações
-          </Link>
-        </li>
+        {congregations.map((congregation) => (
+          <li key={congregation.id}>
+            <Link href={`/congregation/${congregation.id}`}>
+              {congregation.name}
+            </Link>
+          </li>
+        ))}
       </ul>
     </div>
   )
