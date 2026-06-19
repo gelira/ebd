@@ -3,7 +3,7 @@
 import prisma from '@/app/_lib/db/prisma'
 import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { dbGetPerson } from '@/app/_lib/db/person'
-import { getCurrentUser } from '@/app/_lib/services/auth'
+import { requireUser } from '@/app/_lib/services/auth'
 import { getTerm } from '@/app/_lib/db/term'
 import { redirect } from 'next/navigation'
 
@@ -13,11 +13,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
   classroomId: number,
   enrollmentType: 'STUDENT' | 'TEACHER',
 }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const user = await requireUser()
 
   const term = await getTerm({ id: termId, churchId: user.churchId })
 
@@ -79,11 +75,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
 }
 
 export async function deleteEnrollment({ enrollmentId }: { enrollmentId: number }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+  const user = await requireUser()
 
   const enrollment = await prisma.enrollment.findFirst({
     where: {

@@ -1,13 +1,13 @@
 import { dbGetPersons } from '@/app/_lib/db/person'
-import { getCurrentUser } from '@/app/_lib/services/auth'
+import { requireUser } from '@/app/_lib/services/auth'
 import Link from 'next/link'
 import PersonItem from './_components/person-item'
 
 export default async function Page() {
-  const user = await getCurrentUser()
+  const user = await requireUser()
 
   const persons = await dbGetPersons({
-    churchId: user?.churchId ?? 0
+    churchId: user.churchId
   })
 
   return (
