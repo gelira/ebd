@@ -3,11 +3,9 @@
 import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { dbGetPerson } from '@/app/_lib/db/person'
 import prisma from '@/app/_lib/db/prisma'
-import { getTerm } from '@/app/_lib/db/term'
 import { requireUser } from '@/app/_lib/services/auth'
-import { redirect } from 'next/navigation'
 
-export async function createEnrollments({ personIdList, classroomId, termId, enrollmentType }: {
+export async function actionCreateEnrollments({ personIdList, classroomId, termId, enrollmentType }: {
   termId: number
   classroomId: number
   personIdList: number[]
@@ -15,7 +13,12 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
 }) {
   const user = await requireUser()
 
-  const term = await getTerm({ id: termId, churchId: user.churchId })
+  const term = await prisma.term.findFirst({
+    where: {
+      id: termId,
+      churchId: user.churchId,
+    },
+  })
 
   if (!term || term.completed) {
     return {
@@ -71,10 +74,10 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     }
   }
 
-  redirect(`/classroom/${classroomId}`)
+  return { ok: true }
 }
 
-export async function deleteEnrollment({ enrollmentId }: {
+export async function actionDeleteEnrollment({ enrollmentId }: {
   enrollmentId: number
 }) {
   const user = await requireUser()

@@ -1,12 +1,15 @@
+import { dbGetClassroom } from '@/app/_lib/db/classroom'
+import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
+import { dbGetCurrentTerm } from '@/app/_lib/db/term'
+import { requireUser } from '@/app/_lib/services/auth'
+import { parseIntParam } from '@/app/_lib/utils/params'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import Enrollments from './_components/enrollments'
-import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
-import { requireUser } from '@/app/_lib/services/auth'
-import { dbGetClassroom } from '@/app/_lib/db/classroom'
-import { dbGetCurrentTerm } from '@/app/_lib/db/term'
-import { parseIntParam } from '@/app/_lib/utils/params'
 
-export default async function Page({ params }: { params: Promise<{ classroomId: string }> }) {
+export default async function Page({ params }: {
+  params: Promise<{ classroomId: string }>
+}) {
   const { classroomId } = await params
 
   const parsedId = parseIntParam(classroomId)
@@ -31,16 +34,6 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
     classroomId: classroom.id
   })
 
-  const { teachers, students } = enrollments.reduce((acc, curr) => {
-    if (curr.enrollmentType === 'TEACHER') {
-      acc.teachers.push(curr)
-    } else {
-      acc.students.push(curr)
-    }
-
-    return acc
-  }, { teachers: [] as typeof enrollments, students: [] as typeof enrollments })
-
   return (
     <div className="card shadow-sm">
       <div className="card-body">
@@ -50,12 +43,12 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
             <div className="badge badge-neutral badge-outline">
               {currentTerm.termName} - {currentTerm.year}
             </div>
-            <Enrollments
-              classroomId={classroom.id}
-              classroomName={classroom.name}
-              teachers={teachers}
-              students={students}
-            />
+            {enrollments.length > 0 ? (
+              <Enrollments {...{ enrollments }} />
+            ) : (
+              <p>Nenhuma matrícula para o período atual</p>
+            )}
+            <Link href={`/classroom/${classroomId}/enrollments`}>Nova matrícula</Link>
           </>
         ) : (
           <h2>Não há período atual</h2>

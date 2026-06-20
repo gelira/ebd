@@ -19,8 +19,7 @@ export async function dbGetPerson({ id, churchId }: {
   })
 }
 
-export async function getPersonsWithoutEnrollmentsInClassroom({ churchId, classroomId, termId, enrollmentType }: {
-  enrollmentType: 'TEACHER' | 'STUDENT'
+export async function dbGetPersonsWithoutEnrollmentsInClassroom({ churchId, classroomId, termId }: {
   classroomId: number
   churchId: number
   termId: number
@@ -32,7 +31,6 @@ export async function getPersonsWithoutEnrollmentsInClassroom({ churchId, classr
         none: {
           termId,
           classroomId,
-          enrollmentType,
         },
       },
     },

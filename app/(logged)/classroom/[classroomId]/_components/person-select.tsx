@@ -1,17 +1,20 @@
 'use client'
 
-import { createEnrollments } from '@/app/_lib/actions/enrollment'
+import { actionCreateEnrollments } from '@/app/_lib/actions/enrollment'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
 export default function PersonSelect({ termId, classroomId, enrollmentType, persons }: {
-  termId?: number,
-  classroomId: number,
-  enrollmentType: 'TEACHER' | 'STUDENT',
-  persons: { id: number, completeName: string }[],
+  termId?: number
+  classroomId: number
+  enrollmentType: 'TEACHER' | 'STUDENT'
+  persons: { id: number, completeName: string }[]
 }) {
   const [personIdList, setPersonIdList] = useState<number[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [pending, startTransition] = useTransition()
+
+  const router = useRouter()
 
   if (!termId) {
     return (
@@ -21,7 +24,7 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
 
   if (persons.length === 0) {
     return (
-      <p className="text-error text-sm font-medium">Não há pessoas cadastradas</p>
+      <p className="text-error text-sm font-medium">Não há pessoas para matricular</p>
     )
   }
 
@@ -33,12 +36,16 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
 
     startTransition(async () => {
       try {
-        const result = await createEnrollments({
+        const result = await actionCreateEnrollments({
           termId,
           classroomId,
           enrollmentType,
           personIdList,
         })
+
+        if (result.ok) {
+          return router.push(`/classroom/${classroomId}`)
+        }
 
         if (result?.message) {
           setErrorMessage(result.message)
@@ -66,9 +73,9 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
   const selectedPersons = persons.filter((p) => personIdList.includes(p.id))
 
   return (
-    <>  
+    <>
       <div className="form-control w-full">
-        <select 
+        <select
           className="select select-bordered w-full"
           value={0}
           onChange={(e) => handleSelectPerson(Number(e.target.value))}
@@ -84,8 +91,8 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
 
       <div className="flex flex-wrap gap-2">
         {selectedPersons.map((person) => (
-          <button 
-            key={person.id} 
+          <button
+            key={person.id}
             className="badge badge-primary badge-outline gap-2 hover:badge-error transition-colors h-auto py-1.5 px-3"
             onClick={() => handleRemovePerson(person.id)}
             title="Clique para remover"
@@ -99,9 +106,9 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
       {errorMessage && <p className="text-error text-sm font-medium">{errorMessage}</p>}
 
       <div className="card-actions justify-end">
-        <button 
+        <button
           className={`btn btn-primary ${pending ? 'loading' : ''}`}
-          onClick={handleClick} 
+          onClick={handleClick}
           disabled={pending || personIdList.length === 0}
         >
           {pending ? 'Matriculando...' : 'Matricular'}
