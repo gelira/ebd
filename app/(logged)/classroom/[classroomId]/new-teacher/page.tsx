@@ -1,19 +1,24 @@
 import { getPersonsWithoutEnrollmentsInClassroom } from '@/app/_lib/db/person'
+import { requireUser } from '@/app/_lib/services/auth'
 import { getCurrentClassroom } from '@/app/_lib/services/classroom'
 import { getCurrentTerm } from '@/app/_lib/services/term'
+import { parseIntParam } from '@/app/_lib/utils/params'
 import { notFound } from 'next/navigation'
 import PersonSelect from '../_components/person-select'
 
 export default async function Page({ params }: { params: Promise<{ classroomId: string }> }) {
   const { classroomId } = await params
 
-  const classroom = await getCurrentClassroom(Number(classroomId))
+  const parsedParam = parseIntParam(classroomId)
+
+  const user = await requireUser()
+  const classroom = await getCurrentClassroom(parsedParam, user.id)
 
   if (!classroom) {
     notFound()
   }
 
-  const term = await getCurrentTerm()
+  const term = await getCurrentTerm(user.churchId)
 
   const persons = term && await getPersonsWithoutEnrollmentsInClassroom({
     enrollmentType: 'TEACHER',
