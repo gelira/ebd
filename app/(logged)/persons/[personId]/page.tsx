@@ -1,31 +1,28 @@
-import { getPerson } from '@/app/_lib/db/person'
-import { getCurrentUser } from '@/app/_lib/services/auth'
+import { dbGetPerson } from '@/app/_lib/db/person'
+import { requireUser } from '@/app/_lib/services/auth'
+import { parseIntParam } from '@/app/_lib/utils/params'
 import { notFound } from 'next/navigation'
 
 import PersonForm from './_components/form'
 
 export default async function Page({ params }: { params: Promise<{ personId: string }> }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    return null
-  }
+  const user = await requireUser()
   
   const { personId } = await params
 
   const newPerson = personId === 'new'
-  const personIdNumber = Number(personId)
 
   const person = await (async () => {
     if (newPerson) {
       return null
     }
 
-    if (isNaN(personIdNumber)) {
-      notFound()
-    }
+    const parsedId = parseIntParam(personId)
 
-    const person = await getPerson({ id: personIdNumber, churchId: user.churchId })
+    const person = await dbGetPerson({
+      id: parsedId,
+      churchId: user.churchId
+    })
 
     if (!person) {
       notFound()

@@ -1,25 +1,24 @@
 'use server'
 
+import { dbGetClassroom } from '@/app/_lib/db/classroom'
+import { dbGetPerson } from '@/app/_lib/db/person'
 import prisma from '@/app/_lib/db/prisma'
-import { getClassroom } from '@/app/_lib/db/classroom'
-import { getPerson } from '@/app/_lib/db/person'
-import { getCurrentUser } from '@/app/_lib/services/auth'
-import { getTerm } from '@/app/_lib/db/term'
-import { redirect } from 'next/navigation'
+import { requireUser } from '@/app/_lib/services/auth'
 
-export async function createEnrollments({ personIdList, classroomId, termId, enrollmentType }: {
-  termId: number,
-  personIdList: number[],
-  classroomId: number,
-  enrollmentType: 'STUDENT' | 'TEACHER',
+export async function actionCreateEnrollments({ personIdList, classroomId, termId, enrollmentType }: {
+  termId: number
+  classroomId: number
+  personIdList: number[]
+  enrollmentType: 'STUDENT' | 'TEACHER'
 }) {
-  const user = await getCurrentUser()
+  const user = await requireUser()
 
-  if (!user) {
-    redirect('/login')
-  }
-
-  const term = await getTerm({ id: termId, churchId: user.churchId })
+  const term = await prisma.term.findFirst({
+    where: {
+      id: termId,
+      churchId: user.churchId,
+    },
+  })
 
   if (!term || term.completed) {
     return {
@@ -28,7 +27,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     }
   }
 
-  const classroom = await getClassroom({ id: classroomId, userId: user.id })
+  const classroom = await dbGetClassroom({ id: classroomId, userId: user.id })
 
   if (!classroom) {
     return {
@@ -41,7 +40,7 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     await prisma.$transaction(async (tx) => {
       await Promise.all(
         personIdList.map(async (personId) => {
-          const person = await getPerson({ id: personId, churchId: user.churchId })
+          const person = await dbGetPerson({ id: personId, churchId: user.churchId })
 
           if (!person) {
             throw new Error('Person not found')
@@ -75,15 +74,13 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
     }
   }
 
-  redirect(`/classroom/${classroomId}`)
+  return { ok: true }
 }
 
-export async function deleteEnrollment({ enrollmentId }: { enrollmentId: number }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+export async function actionDeleteEnrollment({ enrollmentId }: {
+  enrollmentId: number
+}) {
+  const user = await requireUser()
 
   const enrollment = await prisma.enrollment.findFirst({
     where: {

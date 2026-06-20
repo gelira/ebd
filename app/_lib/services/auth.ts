@@ -1,6 +1,9 @@
+import 'server-only'
+
 import prisma from '@/app/_lib/db/prisma'
 import { sign, verify } from 'jsonwebtoken'
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { cache } from 'react'
 
 const JWT_EXPIRES_IN = 8 * 60 * 60 // 8h
@@ -87,3 +90,13 @@ export async function getAuthenticatedUser(token?: string) {
 }
 
 export const getCurrentUser = cache(getAuthenticatedUser)
+
+export async function requireUser() {
+  const user = await getCurrentUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+  
+  return user
+}

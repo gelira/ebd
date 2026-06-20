@@ -1,6 +1,10 @@
+import 'server-only'
 import prisma from './prisma'
 
-export async function getEnrollmentsByClassroomAndTerm({ classroomId, termId }: { classroomId: number, termId: number }) {
+export async function dbGetEnrollmentsByClassroomAndTerm({ classroomId, termId }: {
+  classroomId: number
+  termId: number
+}) {
   return await prisma.enrollment.findMany({
     where: {
       classroomId,
@@ -17,4 +21,4 @@ export async function getEnrollmentsByClassroomAndTerm({ classroomId, termId }: 
   })
 }
 
-export type EnrollmentWithPerson = Awaited<ReturnType<typeof getEnrollmentsByClassroomAndTerm>>[number]
+export type EnrollmentWithPerson = Awaited<ReturnType<typeof dbGetEnrollmentsByClassroomAndTerm>>[number]

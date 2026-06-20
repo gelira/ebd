@@ -1,6 +1,10 @@
+import 'server-only'
 import prisma from './prisma'
 
-export async function getClassroom({ id, userId }: { id: number, userId: number }) {
+export async function dbGetClassroom({ id, userId }: {
+  id: number
+  userId: number
+}) {
   return await prisma.classroom.findFirst({
     where: {
       AND: [
@@ -12,7 +16,7 @@ export async function getClassroom({ id, userId }: { id: number, userId: number 
                 some: {
                   userId,
                 },
-              },    
+              },
             },
             {
               congregation: {
@@ -39,7 +43,7 @@ export async function getClassroomsByUserId(userId: number) {
             some: {
               userId,
             },
-          },    
+          },
         },
         {
           congregation: {
@@ -61,7 +65,9 @@ export async function getClassroomsByUserId(userId: number) {
   })
 }
 
-export async function getClassroomsByCongregationId(congregationId: number) {
+export async function dbGetClassroomsByCongregationId({ congregationId }: {
+  congregationId: number
+}) {
   return await prisma.classroom.findMany({
     where: {
       congregationId,

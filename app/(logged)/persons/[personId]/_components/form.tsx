@@ -1,11 +1,13 @@
 'use client'
 
-import { createPerson, updatePerson } from '@/app/_lib/actions/person'
+import { actionCreatePerson, actionUpdatePerson } from '@/app/_lib/actions/person'
 import type { Person } from '@/app/_lib/generated/prisma/client'
+import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
 export default function PersonForm({ person }: { person: Person | null }) {
   const [completeName, setCompleteName] = useState(person?.completeName || '')
+  const router = useRouter()
   
   const [birthDate, setBirthDate] = useState(() => {
     const currBirthDate = person?.birthDate
@@ -29,8 +31,11 @@ export default function PersonForm({ person }: { person: Person | null }) {
         }
 
         person?.id
-          ? await updatePerson({ id: person.id, completeName, birthDate })
-          : await createPerson({ completeName, birthDate })
+          ? await actionUpdatePerson({ id: person.id, completeName, birthDate })
+          : await actionCreatePerson({ completeName, birthDate })
+
+        router.push('/persons')
+
       } catch {
         setErrorMessage('Algo deu errado. Tente novamente.')
       }

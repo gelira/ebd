@@ -1,6 +1,9 @@
+import 'server-only'
 import prisma from './prisma'
 
-export async function getCongregationsByUserId(userId: number) {
+export async function dbGetCongregationsByUserId({ userId }: {
+  userId: number
+}) {
   return await prisma.congregation.findMany({
     where: {
       usersCongregation: {
@@ -12,7 +15,10 @@ export async function getCongregationsByUserId(userId: number) {
   })
 }
 
-export async function getCongregation({ id, userId }: { id: number, userId: number }) {
+export async function dbGetCongregation({ id, userId }: {
+  id: number
+  userId: number
+}) {
   return await prisma.congregation.findFirst({
     where: {
       id,

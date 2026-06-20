@@ -1,16 +1,14 @@
 'use server'
 
 import prisma from '@/app/_lib/db/prisma'
-import { getCurrentUser } from '@/app/_lib/services/auth'
+import { requireUser } from '@/app/_lib/services/auth'
 import { parseDateString } from '@/app/_lib/utils/date'
-import { redirect } from 'next/navigation'
 
-export async function createPerson({ completeName, birthDate }: { completeName: string, birthDate: string }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+export async function actionCreatePerson({ completeName, birthDate }: {
+  completeName: string
+  birthDate: string
+}) {
+  const user = await requireUser()
 
   await prisma.person.create({
     data: {
@@ -19,16 +17,14 @@ export async function createPerson({ completeName, birthDate }: { completeName: 
       churchId: user.churchId,
     },
   })
-
-  redirect('/persons')
 }
 
-export async function updatePerson({ id, completeName, birthDate }: { id: number, completeName: string, birthDate: string }) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    redirect('/login')
-  }
+export async function actionUpdatePerson({ id, completeName, birthDate }: {
+  id: number
+  completeName: string
+  birthDate: string
+}) {
+  const user = await requireUser()
 
   await prisma.person.update({
     where: { id, churchId: user.churchId },
@@ -37,6 +33,4 @@ export async function updatePerson({ id, completeName, birthDate }: { id: number
       birthDate: parseDateString(birthDate),
     }
   })
-
-  redirect('/persons')
 }
