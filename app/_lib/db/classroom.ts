@@ -13,7 +13,7 @@ export async function dbGetClassroom({ id, userId }: { id: number, userId: numbe
                 some: {
                   userId,
                 },
-              },    
+              },
             },
             {
               congregation: {
@@ -40,7 +40,7 @@ export async function getClassroomsByUserId(userId: number) {
             some: {
               userId,
             },
-          },    
+          },
         },
         {
           congregation: {
