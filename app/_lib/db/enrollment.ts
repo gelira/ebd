@@ -1,7 +1,10 @@
 import 'server-only'
 import prisma from './prisma'
 
-export async function dbGetEnrollmentsByClassroomAndTerm({ classroomId, termId }: { classroomId: number, termId: number }) {
+export async function dbGetEnrollmentsByClassroomAndTerm({ classroomId, termId }: {
+  classroomId: number
+  termId: number
+}) {
   return await prisma.enrollment.findMany({
     where: {
       classroomId,

@@ -5,7 +5,7 @@ import { requireUser } from '@/app/_lib/services/auth'
 import { parseDateString } from '@/app/_lib/utils/date'
 
 export async function actionCreatePerson({ completeName, birthDate }: {
-  completeName: string,
+  completeName: string
   birthDate: string
 }) {
   const user = await requireUser()
@@ -20,8 +20,8 @@ export async function actionCreatePerson({ completeName, birthDate }: {
 }
 
 export async function actionUpdatePerson({ id, completeName, birthDate }: {
-  id: number,
-  completeName: string,
+  id: number
+  completeName: string
   birthDate: string
 }) {
   const user = await requireUser()

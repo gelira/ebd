@@ -31,7 +31,7 @@ export async function actionGenerateAuthCode({ email }: {
 }
 
 export async function actionValidateAuthCode({ authCodeId, code }: {
-  authCodeId: number,
+  authCodeId: number
   code: string
 }) {
   try {

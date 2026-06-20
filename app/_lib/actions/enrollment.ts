@@ -1,17 +1,17 @@
 'use server'
 
-import prisma from '@/app/_lib/db/prisma'
 import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { dbGetPerson } from '@/app/_lib/db/person'
-import { requireUser } from '@/app/_lib/services/auth'
+import prisma from '@/app/_lib/db/prisma'
 import { getTerm } from '@/app/_lib/db/term'
+import { requireUser } from '@/app/_lib/services/auth'
 import { redirect } from 'next/navigation'
 
 export async function createEnrollments({ personIdList, classroomId, termId, enrollmentType }: {
-  termId: number,
-  personIdList: number[],
-  classroomId: number,
-  enrollmentType: 'STUDENT' | 'TEACHER',
+  termId: number
+  classroomId: number
+  personIdList: number[]
+  enrollmentType: 'STUDENT' | 'TEACHER'
 }) {
   const user = await requireUser()
 
@@ -74,7 +74,9 @@ export async function createEnrollments({ personIdList, classroomId, termId, enr
   redirect(`/classroom/${classroomId}`)
 }
 
-export async function deleteEnrollment({ enrollmentId }: { enrollmentId: number }) {
+export async function deleteEnrollment({ enrollmentId }: {
+  enrollmentId: number
+}) {
   const user = await requireUser()
 
   const enrollment = await prisma.enrollment.findFirst({
