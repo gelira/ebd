@@ -1,6 +1,6 @@
+import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { getPersonsWithoutEnrollmentsInClassroom } from '@/app/_lib/db/person'
 import { requireUser } from '@/app/_lib/services/auth'
-import { getCurrentClassroom } from '@/app/_lib/services/classroom'
 import { getCurrentTerm } from '@/app/_lib/services/term'
 import { parseIntParam } from '@/app/_lib/utils/params'
 import { notFound } from 'next/navigation'
@@ -12,7 +12,10 @@ export default async function Page({ params }: { params: Promise<{ classroomId: 
   const parsedParam = parseIntParam(classroomId)
   
   const user = await requireUser()
-  const classroom = await getCurrentClassroom(parsedParam, user.id)
+  const classroom = await dbGetClassroom({
+    id: parsedParam,
+    userId: user.id
+  })
 
   if (!classroom) {
     notFound()
