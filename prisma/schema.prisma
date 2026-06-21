@@ -224,6 +224,8 @@ model LessonReport {
 
   attendances Attendance[]
 
+  @@unique([lessonId, classroomId])
+
   @@map("lesson_reports")
 }
 
