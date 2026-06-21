@@ -1,9 +1,7 @@
-import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { dbGetPersonsWithoutEnrollmentsInClassroom } from '@/app/_lib/db/person'
 import { dbGetCurrentTerm } from '@/app/_lib/db/term'
 import { requireUser } from '@/app/_lib/services/auth'
-import { parseIntParam } from '@/app/_lib/utils/params'
-import { notFound } from 'next/navigation'
+import { requireClassroom } from '@/app/_lib/services/classroom'
 import PersonSelect from '../_components/person-select'
 
 export default async function Page({ params }: {
@@ -12,16 +10,7 @@ export default async function Page({ params }: {
   const { classroomId } = await params
   
   const user = await requireUser()
-  const parsedParam = parseIntParam(classroomId)
-  
-  const classroom = await dbGetClassroom({
-    id: parsedParam,
-    userId: user.id
-  })
-
-  if (!classroom) {
-    notFound()
-  }
+  const classroom = await requireClassroom({ classroomId, userId: user.id })
 
   const term = await dbGetCurrentTerm({
     churchId: user.churchId

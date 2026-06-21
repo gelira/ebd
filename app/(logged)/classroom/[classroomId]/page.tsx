@@ -1,10 +1,8 @@
-import { dbGetClassroom } from '@/app/_lib/db/classroom'
 import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
 import { dbGetCurrentTerm } from '@/app/_lib/db/term'
 import { requireUser } from '@/app/_lib/services/auth'
-import { parseIntParam } from '@/app/_lib/utils/params'
+import { requireClassroom } from '@/app/_lib/services/classroom'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import Enrollments from './_components/enrollments'
 
 export default async function Page({ params }: {
@@ -12,18 +10,8 @@ export default async function Page({ params }: {
 }) {
   const { classroomId } = await params
 
-  const parsedId = parseIntParam(classroomId)
-
   const user = await requireUser()
-
-  const classroom = await dbGetClassroom({
-    id: parsedId,
-    userId: user.id
-  })
-
-  if (!classroom) {
-    notFound()
-  }
+  const classroom = await requireClassroom({ classroomId, userId: user.id })
 
   const currentTerm = await dbGetCurrentTerm({
     churchId: user.churchId
