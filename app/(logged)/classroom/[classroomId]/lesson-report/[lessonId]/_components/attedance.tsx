@@ -1,14 +1,15 @@
 'use client'
 
 import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
+import type { AttendanceTypeEnum } from '@/app/_lib/generated/prisma/client'
 import { ChangeEvent } from 'react'
 
 export default function Attendance({ enrollment, onChange }: {
   enrollment: EnrollmentWithPerson
-  onChange: (personId: number, attendance: string) => void
+  onChange: (personId: number, attendance: AttendanceTypeEnum) => void
 }) {
   const onSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    onChange(enrollment.personId, event.currentTarget.value)
+    onChange(enrollment.personId, event.currentTarget.value as AttendanceTypeEnum)
   }
 
   return (
@@ -22,9 +23,9 @@ export default function Attendance({ enrollment, onChange }: {
           required
         >
           <option value="" disabled>Selecione</option>
-          <option value="present">Presente</option>
-          <option value="absent">Ausente</option>
-          <option value="justified_absent">Falta justificada</option>
+          <option value="PRESENT">Presente</option>
+          <option value="ABSENT">Ausente</option>
+          <option value="JUSTIFIED_ABSENT">Falta justificada</option>
         </select>
       </label>
     </div>
