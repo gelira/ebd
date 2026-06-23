@@ -1,42 +1,35 @@
 'use client'
 
+import { actionCreateLessonReport } from '@/app/_lib/actions/lesson-report'
 import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
+import type { AttendanceTypeEnum } from '@/app/_lib/generated/prisma/client'
+import { useRouter } from 'next/navigation'
 import { SubmitEvent, useCallback, useState } from 'react'
 import Attendance from './attedance'
 
-/*
-lessonId          Int      @map("lesson_id")
-  classroomId       Int      @map("classroom_id")
-  lessonDate        DateTime @map("lesson_date") @db.Date
-  attendanceAmount  Int      @map("attendance_amount")
-  absenceAmount     Int      @map("absence_amount")
-  visitorsAmount    Int      @map("visitors_amount")
-  holyBiblesAmount  Int      @map("holy_bibles_amount")
-  lessonBooksAmount Int      @map("lesson_books_amount")
-  offeringTotal     Float    @map("offering_total")
-  titheTotal
-
-  PRESENT          @map("present")
-  ABSENT           @map("absent")
-  JUSTIFIED_ABSENT @map("justified_absent")
-*/
-
 export default function RegisterLessonReport({
   enrollments,
-  // classroomId,
-  // lessonId,
+  classroomId,
+  lessonId,
 }: {
   enrollments: EnrollmentWithPerson[]
   classroomId: number
   lessonId: number
 }) {
+  const [visitorsAmount, setVisitorsAmount] = useState(0)
+  const [holyBiblesAmount, setHolyBiblesAmount] = useState(0)
+  const [lessonBooksAmount, setLessonBooksAmount] = useState(0)
+  const [offeringTotal, setOfferingTotal] = useState(0)
+  const [titheTotal, setTitheTotal] = useState(0)
   const [attendances, setAttendances] = useState<{
     personId: number
-    attendance: string
+    attendance: AttendanceTypeEnum
   }[]>([])
 
+  const router = useRouter()
+
   const onAttendanceChange = useCallback(
-    (personId: number, attendance: string) => {
+    (personId: number, attendance: AttendanceTypeEnum) => {
       setAttendances((prev) => {
         const existing = prev.some((att) => att.personId === personId)
 
@@ -59,22 +52,27 @@ export default function RegisterLessonReport({
     
     const formData = new FormData(event.currentTarget)
 
-    const lessonDate = formData.get('lessonDate')
-    const visitorsAmount = formData.get('visitorsAmount')
-    const holyBiblesAmount = formData.get('holyBiblesAmount')
-    const lessonBooksAmount = formData.get('lessonBooksAmount')
-    const offeringTotal = formData.get('offeringTotal')
-    const titheTotal = formData.get('titheTotal')
+    const lessonDate = formData.get('lessonDate') as string
 
-    console.log('form', {
-      lessonDate,
-      visitorsAmount,
+    const { ok, message } = await actionCreateLessonReport({
+      attendances,
+      classroomId,
       holyBiblesAmount,
       lessonBooksAmount,
+      lessonDate,
+      lessonId,
       offeringTotal,
       titheTotal,
-      attendances,
+      visitorsAmount
     })
+
+    if (ok) {
+      router.push(`/classroom/${classroomId}`)
+
+      return
+    }
+
+    console.log('erro', message)
   }
 
   return (
@@ -96,19 +94,37 @@ export default function RegisterLessonReport({
         <div>
           <label>
             Quantidade de visitantes:
-            <input type="number" name="visitorsAmount" />
+            <input
+              type="number"
+              name="visitorsAmount"
+              placeholder="0"
+              onChange={(e) => setVisitorsAmount(parseInt(e.target.value))}
+              required
+            />
           </label>
         </div>
         <div>
           <label>
             Quantidade de bíblias:
-            <input type="number" name="holyBiblesAmount" />
+            <input
+              type="number"
+              name="holyBiblesAmount"
+              placeholder="0"
+              onChange={(e) => setHolyBiblesAmount(parseInt(e.target.value))}
+              required
+            />
           </label>
         </div>
         <div>
           <label>
             Quantidade de lições:
-            <input type="number" name="lessonBooksAmount" />
+            <input
+              type="number"
+              name="lessonBooksAmount"
+              placeholder="0"
+              onChange={(e) => setLessonBooksAmount(parseInt(e.target.value))}
+              required
+            />
           </label>
         </div>
         <div>
@@ -121,6 +137,8 @@ export default function RegisterLessonReport({
               step="0.01"
               placeholder="0.00"
               inputMode="decimal"
+              onChange={(e) => setOfferingTotal(parseFloat(e.target.value))}
+              required
             />
           </label>
         </div>
@@ -134,6 +152,8 @@ export default function RegisterLessonReport({
               step="0.01"
               placeholder="0.00"
               inputMode="decimal"
+              onChange={(e) => setTitheTotal(parseFloat(e.target.value))}
+              required
             />
           </label>
         </div>
