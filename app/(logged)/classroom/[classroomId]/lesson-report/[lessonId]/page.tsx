@@ -1,3 +1,4 @@
+import { dbGetAttendancesByLessonReport } from '@/app/_lib/db/attendance'
 import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
 import { dbGetLessonReport } from '@/app/_lib/db/lesson-report'
 import { requireUser } from '@/app/_lib/services/auth'
@@ -24,16 +25,29 @@ export default async function Page({ params }: {
     lessonId: lesson.id,
   })
 
-  if (lessonReport) {
-    return (
-      <h1>Já registrado</h1>
-    )
-  }
+  const enrollments = await (async () => {
+    if (lessonReport) {
+      const reportAttendances = await dbGetAttendancesByLessonReport({
+        lessonReportId: lesson.id,
+      })
 
-  const enrollments = await dbGetEnrollmentsByClassroomAndTerm({
-    classroomId: classroom.id,
-    termId: lesson.termId,
-  })
+      return reportAttendances.map((at) => ({
+        personId: at.personId,
+        completeName: at.person.completeName,
+        attendance: at.attendance,
+      }))
+    }
+
+    const classroomEnrollments = await dbGetEnrollmentsByClassroomAndTerm({
+      classroomId: classroom.id,
+      termId: lesson.termId,
+    })
+
+    return classroomEnrollments.map((e) => ({
+      personId: e.personId,
+      completeName: e.person.completeName,
+    }))
+  })()
 
   return (
     <div>
@@ -43,6 +57,7 @@ export default async function Page({ params }: {
         enrollments={enrollments}
         classroomId={classroom.id}
         lessonId={lesson.id}
+        lessonReport={lessonReport}
       />
     </div>
   )

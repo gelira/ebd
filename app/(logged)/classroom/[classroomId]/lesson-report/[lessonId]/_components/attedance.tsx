@@ -1,25 +1,31 @@
 'use client'
 
-import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
 import type { AttendanceTypeEnum } from '@/app/_lib/generated/prisma/client'
 import { ChangeEvent } from 'react'
 
-export default function Attendance({ enrollment, onChange }: {
-  enrollment: EnrollmentWithPerson
+export default function Attendance({
+  personId,
+  completeName,
+  attendance,
+  onChange
+}: {
+  personId: number
+  completeName: string
+  attendance?: AttendanceTypeEnum
   onChange: (personId: number, attendance: AttendanceTypeEnum) => void
 }) {
   const onSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    onChange(enrollment.personId, event.currentTarget.value as AttendanceTypeEnum)
+    onChange(personId, event.currentTarget.value as AttendanceTypeEnum)
   }
 
   return (
     <div>
       <label>
-        {enrollment.person.completeName}
+        {completeName}
         <select
           onChange={onSelectChange}
-          name={`attendance-${enrollment.personId}`}
-          defaultValue=""
+          name={`attendance-${personId}`}
+          defaultValue={attendance ?? ''}
           required
         >
           <option value="" disabled>Selecione</option>

@@ -1,8 +1,7 @@
 'use client'
 
-import { actionCreateLessonReport } from '@/app/_lib/actions/lesson-report'
-import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
-import type { AttendanceTypeEnum } from '@/app/_lib/generated/prisma/client'
+import { actionCreateLessonReport, actionUpdateLessonReport } from '@/app/_lib/actions/lesson-report'
+import type { AttendanceTypeEnum, LessonReport } from '@/app/_lib/generated/prisma/client'
 import { useRouter } from 'next/navigation'
 import { SubmitEvent, useCallback, useState } from 'react'
 import Attendance from './attedance'
@@ -11,16 +10,23 @@ export default function RegisterLessonReport({
   enrollments,
   classroomId,
   lessonId,
+  lessonReport,
 }: {
-  enrollments: EnrollmentWithPerson[]
+  enrollments: {
+    personId: number
+    completeName: string
+    attendance?: AttendanceTypeEnum
+  }[]
+  lessonReport: LessonReport | null
   classroomId: number
   lessonId: number
 }) {
-  const [visitorsAmount, setVisitorsAmount] = useState(0)
-  const [holyBiblesAmount, setHolyBiblesAmount] = useState(0)
-  const [lessonBooksAmount, setLessonBooksAmount] = useState(0)
-  const [offeringTotal, setOfferingTotal] = useState(0)
-  const [titheTotal, setTitheTotal] = useState(0)
+  const [lessonDate, setLessonDate] = useState(lessonReport?.lessonDate.toISOString().slice(0, 10))
+  const [visitorsAmount, setVisitorsAmount] = useState(lessonReport?.visitorsAmount)
+  const [holyBiblesAmount, setHolyBiblesAmount] = useState(lessonReport?.holyBiblesAmount)
+  const [lessonBooksAmount, setLessonBooksAmount] = useState(lessonReport?.lessonBooksAmount)
+  const [offeringTotal, setOfferingTotal] = useState(lessonReport?.offeringTotal)
+  const [titheTotal, setTitheTotal] = useState(lessonReport?.titheTotal)
   const [attendances, setAttendances] = useState<{
     personId: number
     attendance: AttendanceTypeEnum
@@ -49,22 +55,53 @@ export default function RegisterLessonReport({
 
   const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
-    
-    const formData = new FormData(event.currentTarget)
 
-    const lessonDate = formData.get('lessonDate') as string
+    if (
+      holyBiblesAmount === undefined ||
+      lessonBooksAmount === undefined ||
+      visitorsAmount === undefined ||
+      offeringTotal === undefined ||
+      titheTotal === undefined ||
+      !lessonDate
+    ) {
+      return
+    }
 
-    const { ok, message } = await actionCreateLessonReport({
-      attendances,
-      classroomId,
-      holyBiblesAmount,
-      lessonBooksAmount,
-      lessonDate,
-      lessonId,
-      offeringTotal,
-      titheTotal,
-      visitorsAmount
-    })
+    let ok = false
+    let message = ''
+
+    if (lessonReport) {
+      const result = await actionUpdateLessonReport({
+        attendances,
+        classroomId,
+        holyBiblesAmount,
+        lessonBooksAmount,
+        lessonDate,
+        lessonId,
+        offeringTotal,
+        titheTotal,
+        visitorsAmount
+      })
+
+      ok = result.ok
+      message = result?.message ?? ''
+    } else {
+      const result = await actionCreateLessonReport({
+        attendances,
+        classroomId,
+        holyBiblesAmount,
+        lessonBooksAmount,
+        lessonDate,
+        lessonId,
+        offeringTotal,
+        titheTotal,
+        visitorsAmount
+      })
+
+      ok = result.ok
+      message = result?.message ?? ''
+    }
+
 
     if (ok) {
       router.push(`/classroom/${classroomId}`)
@@ -81,13 +118,21 @@ export default function RegisterLessonReport({
         <div>
           <label>
             Data da aula:
-            <input type="date" name="lessonDate" required />
+            <input
+              type="date"
+              name="lessonDate"
+              value={lessonDate}
+              onChange={(e) => setLessonDate(e.target.value)}
+              required
+            />
           </label>
         </div>
-        {enrollments.map((enrollment) => (
+        {enrollments.map((e) => (
           <Attendance
-            key={enrollment.id}
-            enrollment={enrollment}
+            key={e.personId}
+            personId={e.personId}
+            completeName={e.completeName}
+            attendance={e.attendance}
             onChange={onAttendanceChange}
           />
         ))}
@@ -98,6 +143,7 @@ export default function RegisterLessonReport({
               type="number"
               name="visitorsAmount"
               placeholder="0"
+              value={visitorsAmount}
               onChange={(e) => setVisitorsAmount(parseInt(e.target.value))}
               required
             />
@@ -110,6 +156,7 @@ export default function RegisterLessonReport({
               type="number"
               name="holyBiblesAmount"
               placeholder="0"
+              value={holyBiblesAmount}
               onChange={(e) => setHolyBiblesAmount(parseInt(e.target.value))}
               required
             />
@@ -122,6 +169,7 @@ export default function RegisterLessonReport({
               type="number"
               name="lessonBooksAmount"
               placeholder="0"
+              value={lessonBooksAmount}
               onChange={(e) => setLessonBooksAmount(parseInt(e.target.value))}
               required
             />
@@ -137,6 +185,7 @@ export default function RegisterLessonReport({
               step="0.01"
               placeholder="0.00"
               inputMode="decimal"
+              value={offeringTotal}
               onChange={(e) => setOfferingTotal(parseFloat(e.target.value))}
               required
             />
@@ -152,6 +201,7 @@ export default function RegisterLessonReport({
               step="0.01"
               placeholder="0.00"
               inputMode="decimal"
+              value={titheTotal}
               onChange={(e) => setTitheTotal(parseFloat(e.target.value))}
               required
             />
