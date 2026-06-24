@@ -1,5 +1,7 @@
 'use server'
 
+import { dbGetAttendancesByLessonReport } from '@/app/_lib/db/attendance'
+import { dbGetLessonReport } from '@/app/_lib/db/lesson-report'
 import prisma from '@/app/_lib/db/prisma'
 import { AttendanceTypeEnum } from '@/app/_lib/generated/prisma/client'
 import { requireUser } from '@/app/_lib/services/auth'
@@ -103,6 +105,120 @@ export async function actionCreateLessonReport({
             data: {
               lessonReportId: lessonReport.id,
               personId: at.personId,
+              attendance: at.attendance,
+            },
+          })
+        )
+      )
+    })
+  } catch (err) {
+    console.log(err)
+
+    return {
+      ok: false,
+      message: (err as Error)?.message || 'Não foi possível registrar o diário'
+    }
+  }
+
+  return { ok: true }
+}
+
+export async function actionUpdateLessonReport({
+  attendances,
+  holyBiblesAmount,
+  lessonBooksAmount,
+  lessonDate,
+  offeringTotal,
+  titheTotal,
+  visitorsAmount,
+  classroomId,
+  lessonId
+}: {
+  lessonId: number
+  classroomId: number
+  lessonDate: string
+  visitorsAmount: number
+  holyBiblesAmount: number
+  lessonBooksAmount: number
+  offeringTotal: number
+  titheTotal: number
+  attendances: {
+    personId: number
+    attendance: AttendanceTypeEnum
+  }[]
+}) {
+  const user = await requireUser()
+  const lesson = await requireLesson({ churchId: user.churchId, lessonId })
+
+  if (lesson.completed || lesson.term.completed) {
+    return {
+      ok: false,
+      message: 'Não é possível alterar diários dessa aula',
+    }
+  }
+
+  const lessonReport = await dbGetLessonReport({
+    classroomId,
+    lessonId
+  })
+
+  if (!lessonReport) {
+    return {
+      ok: false,
+      message: 'Não encontrado',
+    }
+  }
+
+  const reportAttendances = await dbGetAttendancesByLessonReport({
+    lessonReportId: lessonReport.id
+  })
+
+  const newAttendances = reportAttendances.map((at) => {
+    const newAttendance = attendances.find((a) => a.personId === at.personId)
+
+    return {
+      id: at.id,
+      attendance: newAttendance?.attendance ?? at.attendance
+    }
+  })
+
+  const attendanceAmount = newAttendances.reduce((acc, curr) => {
+    let count = acc
+
+    if (curr.attendance === AttendanceTypeEnum.PRESENT) {
+      count = count + 1
+    }
+
+    return count
+  }, 0)
+
+  const absenceAmount = newAttendances.length - attendanceAmount
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.lessonReport.update({
+        where: {
+          id: lessonReport.id
+        },
+        data: {
+          absenceAmount,
+          attendanceAmount,
+          holyBiblesAmount,
+          lessonBooksAmount,
+          lessonDate: new Date(lessonDate),
+          offeringTotal,
+          titheTotal,
+          visitorsAmount,
+        }
+      })
+
+      await Promise.all(
+        newAttendances.map(
+          (at) => tx.attendance.update({
+            where: {
+              id: at.id
+            },
+            data: {
               attendance: at.attendance,
             },
           })
