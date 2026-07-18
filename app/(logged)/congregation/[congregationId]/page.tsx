@@ -1,28 +1,21 @@
 import { dbGetClassroomsByCongregationId } from '@/app/_lib/db/classroom'
-import { dbGetCongregation } from '@/app/_lib/db/congregation'
 import { requireUser } from '@/app/_lib/services/auth'
-import { parseIntParam } from '@/app/_lib/utils/params'
+import { requireCongregation } from '@/app/_lib/services/congregation'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 
-export default async function Page({ params }: { params: Promise<{ congregationId: string }> }) {
+export default async function Page({ params }: {
+  params: Promise<{ congregationId: string }>
+}) {
   const { congregationId } = await params
 
-  const parsedId = parseIntParam(congregationId)
-
   const user = await requireUser()
-
-  const congregation = await dbGetCongregation({
-    id: parsedId,
-    userId: user.id
+  const congregation = await requireCongregation({
+    congregationId,
+    userId: user.id,
   })
 
-  if (!congregation) {
-    notFound()
-  }
-
   const classrooms = await dbGetClassroomsByCongregationId({
-    congregationId: parsedId,
+    congregationId: congregation.id,
   })
 
   return (
