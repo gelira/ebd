@@ -1,7 +1,6 @@
 'use client'
 
 import InputError from '@/app/_components/input-error'
-import { actionValidateAuthCode } from '@/app/_lib/actions/auth'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
@@ -21,9 +20,15 @@ export default function SecondStep({ authCodeId }: { authCodeId: number }) {
 
     startTransition(async () => {
       try {
-        const { ok } = await actionValidateAuthCode({ authCodeId, code })
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({ authCodeId, code })
+        })
 
-        if (!ok) {
+        if (!response.ok) {
           throw new Error()
         }
 
