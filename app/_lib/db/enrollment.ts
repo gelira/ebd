@@ -21,6 +21,23 @@ export async function dbGetEnrollmentsByClassroomAndTerm({ classroomId, termId }
   })
 }
 
+export async function dbGetPersonIdListEnrolledToClassroom({ classroomId, termId }: {
+  classroomId: number
+  termId: number
+}) {
+    const enrollments = await prisma.enrollment.findMany({
+    where: {
+      classroomId,
+      termId,
+    },
+    select: {
+      personId: true
+    }
+  })
+
+  return enrollments.map((e) => e.personId)
+}
+
 export async function dbCreateEnrollments({ termId, churchId, classroomId, personIdList }: {
   termId: number
   churchId: number
