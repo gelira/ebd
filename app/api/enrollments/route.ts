@@ -6,9 +6,9 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 const PostSchema = z.object({
-  termId: z.number().int(),
-  classroomId: z.number().int(),
-  personIdList: z.array(z.number().int()).min(1)
+  termId: z.number().int().positive(),
+  classroomId: z.number().int().positive(),
+  personIdList: z.array(z.number().int().positive()).min(1)
 })
 
 export async function POST(request: Request) {
