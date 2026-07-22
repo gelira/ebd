@@ -6,8 +6,8 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 const PostSchema = z.object({
-  termId: z.number(),
-  classroomId: z.number(),
+  termId: z.number().int(),
+  classroomId: z.number().int(),
   personIdList: z.array(z.number().int()).min(1)
 })
 
