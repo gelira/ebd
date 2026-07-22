@@ -1,6 +1,5 @@
 'use client'
 
-import { actionCreatePerson, actionUpdatePerson } from '@/app/_lib/actions/person'
 import type { Person } from '@/app/_lib/generated/prisma/client'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
@@ -30,9 +29,20 @@ export default function PersonForm({ person }: { person: Person | null }) {
           return
         }
 
-        person?.id
-          ? await actionUpdatePerson({ id: person.id, completeName, birthDate })
-          : await actionCreatePerson({ completeName, birthDate })
+        const url = `/api/persons${person?.id ? `/${person.id}` : '' }`
+        const method = person?.id ? 'PUT' : 'POST'
+
+        const response = await fetch(url, {
+          method,
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({ completeName, birthDate })
+        })
+
+        if (!response.ok) {
+          throw new Error()
+        }
 
         router.push('/persons')
 
