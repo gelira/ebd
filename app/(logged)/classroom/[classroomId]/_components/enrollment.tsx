@@ -1,6 +1,5 @@
 'use client'
 
-import { actionDeleteEnrollment } from '@/app/_lib/actions/enrollment'
 import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
 import { useState, useTransition } from 'react'
 
@@ -17,18 +16,19 @@ export default function Enrollment({ enrollment, deletedCallback }: {
       try {
         const enrollmentId = enrollment.id
 
-        const { ok, message } = await actionDeleteEnrollment({ enrollmentId })
+        const response = await fetch(`/api/enrollments/${enrollmentId}`, {
+          method: 'DELETE'
+        })
 
-        if (!ok) {
-          if (message) {
-            setMessage(message)
-          }
-
-          return
+        if (response.ok) {
+          return deletedCallback(enrollmentId)
         }
 
-        deletedCallback(enrollmentId)
+        const data = await response.json()
 
+        if (data.message) {
+          setMessage(data.message)
+        }
       } catch {
         setMessage('Erro ao excluir matrícula. Tente novamente')
       }

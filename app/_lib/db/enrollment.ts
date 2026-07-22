@@ -21,4 +21,63 @@ export async function dbGetEnrollmentsByClassroomAndTerm({ classroomId, termId }
   })
 }
 
+export async function dbGetPersonIdListEnrolledToClassroom({ classroomId, termId }: {
+  classroomId: number
+  termId: number
+}) {
+    const enrollments = await prisma.enrollment.findMany({
+    where: {
+      classroomId,
+      termId,
+    },
+    select: {
+      personId: true
+    }
+  })
+
+  return enrollments.map((e) => e.personId)
+}
+
+export async function dbCreateEnrollments({ termId, churchId, classroomId, personIdList }: {
+  termId: number
+  churchId: number
+  classroomId: number
+  personIdList: number[]
+}) {
+  const enrollmentType = 'STUDENT'
+
+  await prisma.$transaction(async (tx) => {
+    await Promise.all(
+      personIdList.map(async (personId) => {
+        const person = await prisma.person.findFirst({
+          where: { id: personId, churchId }
+        })
+
+        if (!person) {
+          throw new Error('Person not found')
+        }
+
+        return await tx.enrollment.upsert({
+          where: {
+            personId_classroomId_termId: {
+              personId,
+              classroomId,
+              termId,
+            }
+          },
+          update: {
+            enrollmentType,
+          },
+          create: {
+            personId,
+            classroomId,
+            termId,
+            enrollmentType,
+          }
+        })
+      })
+    )
+  })
+}
+
 export type EnrollmentWithPerson = Awaited<ReturnType<typeof dbGetEnrollmentsByClassroomAndTerm>>[number]

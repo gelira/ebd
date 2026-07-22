@@ -33,7 +33,6 @@ export default async function Page({ params }: {
           classroomId={classroom.id}
           termId={term?.id}
           persons={persons ?? []}
-          enrollmentType="STUDENT"
         />
       </div>
     </div>

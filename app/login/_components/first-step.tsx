@@ -1,7 +1,6 @@
 'use client'
 
 import InputError from '@/app/_components/input-error'
-import { actionGenerateAuthCode } from '@/app/_lib/actions/auth'
 import { useState, useTransition } from 'react'
 
 export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }) {
@@ -18,13 +17,17 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
 
     startTransition(async () => {
       try {
-        const { ok, authCodeId } = await actionGenerateAuthCode({ email })
+        const params = new URLSearchParams({ email })
+        const response = await fetch(`/api/login?${params}`)
 
-        if (!ok) {
+        if (!response.ok) {
           throw new Error()
         }
 
+        const { authCodeId }: { authCodeId: number } = await response.json()
+
         nextStep(authCodeId)
+
       } catch {
         setErrorMessage('Algo deu errado. Tente novamente.')
       }

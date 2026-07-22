@@ -1,6 +1,5 @@
 'use client'
 
-import { actionCreateLessonReport, actionUpdateLessonReport } from '@/app/_lib/actions/lesson-report'
 import type { AttendanceTypeEnum, LessonReport } from '@/app/_lib/generated/prisma/client'
 import { useRouter } from 'next/navigation'
 import { SubmitEvent, useCallback, useState } from 'react'
@@ -67,49 +66,36 @@ export default function RegisterLessonReport({
       return
     }
 
-    let ok = false
-    let message = ''
-
-    if (lessonReport) {
-      const result = await actionUpdateLessonReport({
-        attendances,
-        classroomId,
-        holyBiblesAmount,
-        lessonBooksAmount,
-        lessonDate,
-        lessonId,
-        offeringTotal,
-        titheTotal,
-        visitorsAmount
+    try {
+      const response = await fetch('/api/lesson-report', {
+        method: lessonReport ? 'PUT' : 'POST',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          attendances,
+          classroomId,
+          holyBiblesAmount,
+          lessonBooksAmount,
+          lessonDate,
+          lessonId,
+          offeringTotal,
+          titheTotal,
+          visitorsAmount
+        })
       })
 
-      ok = result.ok
-      message = result?.message ?? ''
-    } else {
-      const result = await actionCreateLessonReport({
-        attendances,
-        classroomId,
-        holyBiblesAmount,
-        lessonBooksAmount,
-        lessonDate,
-        lessonId,
-        offeringTotal,
-        titheTotal,
-        visitorsAmount
-      })
+      if (response.ok) {
+        return router.push(`/classroom/${classroomId}`)
+      }
 
-      ok = result.ok
-      message = result?.message ?? ''
+      const data = await response.json()
+
+      console.log('erro', data)
+
+    } catch (e) {
+      console.log('erro', e)
     }
-
-
-    if (ok) {
-      router.push(`/classroom/${classroomId}`)
-
-      return
-    }
-
-    console.log('erro', message)
   }
 
   return (
