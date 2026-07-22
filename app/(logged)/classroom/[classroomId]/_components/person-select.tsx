@@ -1,13 +1,11 @@
 'use client'
 
-import { actionCreateEnrollments } from '@/app/_lib/actions/enrollment'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
-export default function PersonSelect({ termId, classroomId, enrollmentType, persons }: {
+export default function PersonSelect({ termId, classroomId, persons }: {
   termId?: number
   classroomId: number
-  enrollmentType: 'TEACHER' | 'STUDENT'
   persons: { id: number, completeName: string }[]
 }) {
   const [personIdList, setPersonIdList] = useState<number[]>([])
@@ -36,19 +34,26 @@ export default function PersonSelect({ termId, classroomId, enrollmentType, pers
 
     startTransition(async () => {
       try {
-        const result = await actionCreateEnrollments({
-          termId,
-          classroomId,
-          enrollmentType,
-          personIdList,
+        const response = await fetch('/api/enrollments', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            termId,
+            classroomId,
+            personIdList
+          })
         })
 
-        if (result.ok) {
+        if (response.ok) {
           return router.push(`/classroom/${classroomId}`)
         }
 
-        if (result?.message) {
-          setErrorMessage(result.message)
+        const data = await response.json()
+
+        if (data.message) {
+          setErrorMessage(data.message)
         } else {
           setPersonIdList([])
         }
