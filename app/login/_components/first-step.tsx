@@ -1,9 +1,11 @@
 'use client'
 
-import InputError from '@/app/_components/input-error'
+import { Button, Stack, TextField } from '@mui/material'
 import { useState, useTransition } from 'react'
 
-export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number) => void }) {
+export default function FirstStep({ nextStep }: {
+  nextStep: (authCodeId: number) => void
+}) {
   const [email, setEmail] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -35,35 +37,31 @@ export default function FirstStep({ nextStep }: { nextStep: (authCodeId: number)
   }
 
   return (
-    <>
-      <div className="mt-8">
-        <label className="floating-label">
-          <span>Email</span>
-          <input
-            type="text"
-            placeholder="Email"
-            className={`input input-md ${errorMessage ? 'input-error' : ''}`}
-            onChange={
-              (e) => {
-                setErrorMessage('')
-                setEmail(e.target.value)
-              }
-            }
-            value={email}
-          />
-        </label>
-        <InputError errorMessage={errorMessage} />
-      </div>
+    <Stack spacing={3}>
+      <TextField
+        label="E-mail"
+        type="email"
+        fullWidth
+        value={email}
+        error={!!errorMessage}
+        helperText={errorMessage}
+        onChange={
+          (e) => {
+            setErrorMessage('')
+            setEmail(e.target.value)
+          }
+        }
+      />
 
-      <div className="mt-4">
-        <button
-          className="btn btn-primary btn-block"
-          onClick={handleSubmit}
-          disabled={pending}
-        >
-          Enviar código
-        </button>
-      </div>
-    </>
+      <Button
+        type="submit"
+        variant="contained"
+        size="large"
+        onClick={handleSubmit}
+        loading={pending}
+      >
+        Enviar código
+      </Button>
+    </Stack>
   )
 }

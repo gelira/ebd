@@ -1,6 +1,6 @@
 'use client'
 
-import InputError from '@/app/_components/input-error'
+import { Button, Stack, TextField } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
@@ -40,37 +40,31 @@ export default function SecondStep({ authCodeId }: { authCodeId: number }) {
     })
   }
 
-  return (
-    <>
-      <div className="mt-8">
-        <label className="floating-label">
-          <span>Código</span>
-          <input
-            type="text"
-            placeholder="Código"
-            autoComplete="off"
-            className={`input input-md ${errorMessage ? 'input-error' : ''}`}
-            onChange={
-              (e) => {
-                setErrorMessage('')
-                setCode(e.target.value)
-              }
-            }
-            value={code}
-          />
-        </label>
-        <InputError errorMessage={errorMessage} />
-      </div>
+    return (
+    <Stack spacing={3}>
+      <TextField
+        label="Código"
+        fullWidth
+        value={code}
+        error={!!errorMessage}
+        helperText={errorMessage}
+        onChange={
+          (e) => {
+            setErrorMessage('')
+            setCode(e.target.value)
+          }
+        }
+      />
 
-      <div className="mt-4">
-        <button
-          className="btn btn-success btn-block"
-          onClick={handleSubmit}
-          disabled={pending}
-        >
-          Entrar
-        </button>
-      </div>
-    </>
+      <Button
+        color="success"
+        variant="contained"
+        size="large"
+        onClick={handleSubmit}
+        loading={pending}
+      >
+        Entrar
+      </Button>
+    </Stack>
   )
 }
