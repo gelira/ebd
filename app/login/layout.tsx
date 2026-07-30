@@ -1,6 +1,8 @@
 import { getCurrentUser } from '@/app/_lib/services/auth'
 import { redirect } from 'next/navigation'
 
+import { Box, Container } from '@mui/material'
+
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
 
@@ -9,11 +11,17 @@ export default async function Layout({ children }: { children: React.ReactNode }
   }
 
   return (
-    <div className="flex justify-center items-center px-5 h-screen">
-      <div className="w-full max-w-xs">
-        <h2 className="text-3xl font-bold text-center">Sistema EBD</h2>
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          display: 'flex',
+          minHeight: '100vh',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
         {children}
-      </div>
-    </div>
+      </Box>
+    </Container>
   )
 }
