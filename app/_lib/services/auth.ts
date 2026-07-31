@@ -100,3 +100,5 @@ export async function requireUser() {
   
   return user
 }
+
+export type RequiredUser = Awaited<ReturnType<typeof requireUser>>
