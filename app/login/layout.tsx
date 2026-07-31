@@ -15,7 +15,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <Box
         sx={{
           display: 'flex',
-          minHeight: '100vh',
+          minHeight: '100dvh',
           alignItems: 'center',
           justifyContent: 'center'
         }}
