@@ -1,27 +1,33 @@
-import { dbGetPersons } from '@/app/_lib/db/person'
+import prisma from '@/app/_lib/db/prisma'
 import { requireUser } from '@/app/_lib/services/auth'
+import { Button, Stack, Typography } from '@mui/material'
 import Link from 'next/link'
-import PersonItem from './_components/person-item'
+
+import PersonsTable from './_components/persons-table'
 
 export default async function Page() {
   const user = await requireUser()
 
-  const persons = await dbGetPersons({
-    churchId: user.churchId
+  const persons = await prisma.person.findMany({
+    where: { churchId: user.churchId },
+    orderBy: { completeName: 'asc' },
   })
 
   return (
-    <div>
-      <Link href="/persons/new">Cadastrar nova pessoa</Link>
-      {persons.length === 0 ? (
-        <p>Nenhuma pessoa cadastrada</p>
-      ) : (
-        <>
-          {persons.map((person) => (
-            <PersonItem key={person.id} person={person} />
-          ))}
-        </>
-      )}
-    </div>
+    <>
+      <Stack
+        direction="row"
+        sx={{
+          justifyContent: 'space-between',
+          mb: 2
+        }}
+      >
+        <Typography variant="h5">Lista de pessoas</Typography>
+        <Link href="/persons/new">
+          <Button variant="contained" color="primary">Adicionar</Button>
+        </Link>
+      </Stack>
+      <PersonsTable persons={persons} />
+    </>
   )
 }
