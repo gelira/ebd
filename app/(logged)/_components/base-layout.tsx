@@ -76,7 +76,7 @@ export default function BaseLayout({ children, menuElement, user }: {
           pt: 0
         }}
       >
-        <Toolbar />
+        <Toolbar sx={{ mb: 2 }} />
         {children}
       </Box>
     </Box>
