@@ -1,7 +1,8 @@
 import type { Congregation } from '@/app/_lib/generated/prisma/client'
 import type { RequiredUser } from '@/app/_lib/services/auth'
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material'
+import { Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
+import PeopleIcon from '@mui/icons-material/People'
 import Link from 'next/link'
 
 export default function SideMenu({ congregations, user, onItemClick }: {
@@ -18,6 +19,8 @@ export default function SideMenu({ congregations, user, onItemClick }: {
         <ListItemText primary={user.name} />
       </ListItem>
 
+      <Divider />
+
       {congregations.length > 0 && (
         <ListSubheader>Congregações</ListSubheader>
       )}
@@ -33,6 +36,15 @@ export default function SideMenu({ congregations, user, onItemClick }: {
           </Link>
         </ListItemButton>
       ))}
+
+      <Divider />
+
+      <ListItemButton component={Link} href="/persons" onClick={onItemClick}>
+        <ListItemIcon>
+          <PeopleIcon />
+        </ListItemIcon>
+        <ListItemText primary="Pessoas" />
+      </ListItemButton>
     </List>
   )
 }
