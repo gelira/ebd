@@ -1,5 +1,9 @@
 'use client'
 
+import Autocomplete from '@mui/material/Autocomplete'
+import Button from '@mui/material/Button'
+import Chip from '@mui/material/Chip'
+import TextField from '@mui/material/TextField'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
@@ -63,61 +67,60 @@ export default function PersonSelect({ termId, classroomId, persons }: {
     })
   }
 
-  const handleSelectPerson = (id: number) => {
-    if (id === 0) return
-    if (!personIdList.includes(id)) {
-      setPersonIdList((prev) => [...prev, id])
-    }
-    setErrorMessage('')
-  }
-
   const handleRemovePerson = (id: number) => {
     setPersonIdList((prev) => prev.filter((pId) => pId !== id))
   }
 
-  const selectedPersons = persons.filter((p) => personIdList.includes(p.id))
+  const selectedPersons = persons.filter((person) => personIdList.includes(person.id))
 
   return (
     <>
-      <div className="form-control w-full">
-        <select
-          className="select select-bordered w-full"
-          value={0}
-          onChange={(e) => handleSelectPerson(Number(e.target.value))}
-        >
-          <option value={0} disabled>Selecione uma pessoa...</option>
-          {persons
-            .filter((p) => !personIdList.includes(p.id))
-            .map((person) => (
-              <option key={person.id} value={person.id}>{person.completeName}</option>
-            ))}
-        </select>
-      </div>
+      <Autocomplete
+        multiple
+        options={persons}
+        value={selectedPersons}
+        filterSelectedOptions
+        getOptionLabel={(person) => person.completeName}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+        onChange={(_, selected) => {
+          setPersonIdList(selected.map((person) => person.id))
+          setErrorMessage('')
+        }}
+        renderValue={(selected, getItemProps) =>
+          selected.map((person, index) => {
+            const { key, ...itemProps } = getItemProps({ index })
 
-      <div className="flex flex-wrap gap-2">
-        {selectedPersons.map((person) => (
-          <button
-            key={person.id}
-            className="badge badge-primary badge-outline gap-2 hover:badge-error transition-colors h-auto py-1.5 px-3"
-            onClick={() => handleRemovePerson(person.id)}
-            title="Clique para remover"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-4 h-4 stroke-current"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            {person.completeName}
-          </button>
-        ))}
-      </div>
+            return (
+              <Chip
+                key={key}
+                label={person.completeName}
+                title="Clique para remover"
+                {...itemProps}
+                onClick={() => handleRemovePerson(person.id)}
+              />
+            )
+          })
+        }
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Alunos"
+            placeholder="Digite para buscar alunos"
+          />
+        )}
+      />
 
       {errorMessage && <p className="text-error text-sm font-medium">{errorMessage}</p>}
 
-      <div className="card-actions justify-end">
-        <button
-          className={`btn btn-primary ${pending ? 'loading' : ''}`}
+      <div className="card-actions justify-end mt-3">
+        <Button
+          variant="contained"
+          color="success"
           onClick={handleClick}
           disabled={pending || personIdList.length === 0}
         >
-          {pending ? 'Matriculando...' : 'Matricular'}
-        </button>
+          {pending ? 'Salvando...' : 'Salvar'}
+        </Button>
       </div>
     </>
   )
