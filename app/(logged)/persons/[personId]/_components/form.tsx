@@ -1,6 +1,8 @@
 'use client'
 
 import type { Person } from '@/app/_lib/generated/prisma/client'
+import { Alert, Button, Stack, TextField, Typography } from '@mui/material'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useTransition } from 'react'
 
@@ -53,39 +55,50 @@ export default function PersonForm({ person }: { person: Person | null }) {
   }
 
   return (
-    <div>
-      <div>
-        <label>
-          Nome completo:
-          <input
-            type="text"
-            value={completeName}
-            onChange={
-              (e) => {
-                setErrorMessage('')
-                setCompleteName(e.target.value)
-              }
-            }
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Data de nascimento:
-          <input
-            type="date"
-            value={birthDate}
-            onChange={
-              (e) => {
-                setErrorMessage('')
-                setBirthDate(e.target.value)
-              }
-            }
-          />
-        </label>
-      </div>
-      <button onClick={handleSubmit} disabled={pending}>Salvar</button>
-      {errorMessage && <p>{errorMessage}</p>}
-    </div>
+    <Stack spacing={3} sx={{ width: '100%', maxWidth: 600 }}>
+      <Link href="/persons">
+        <Button variant="text" sx={{ alignSelf: 'flex-start' }}>
+          Voltar para a lista de pessoas
+        </Button>
+      </Link>
+
+      <Typography component="h1" variant="h5">
+        {person ? 'Editar pessoa' : 'Adicionar pessoa'}
+      </Typography>
+
+      <TextField
+        label="Nome completo"
+        value={completeName}
+        onChange={(e) => {
+          setErrorMessage('')
+          setCompleteName(e.target.value)
+        }}
+        fullWidth
+      />
+
+      <TextField
+        label="Data de nascimento"
+        type="date"
+        value={birthDate}
+        onChange={(e) => {
+          setErrorMessage('')
+          setBirthDate(e.target.value)
+        }}
+        slotProps={{ inputLabel: { shrink: true } }}
+        fullWidth
+      />
+
+      {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSubmit}
+        disabled={pending}
+        sx={{ alignSelf: 'flex-start' }}
+      >
+        {pending ? 'Salvando...' : 'Salvar'}
+      </Button>
+    </Stack>
   )
 }
