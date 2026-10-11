@@ -2,6 +2,7 @@ import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
 import { dbGetCurrentTerm } from '@/app/_lib/db/term'
 import { requireUser } from '@/app/_lib/services/auth'
 import { requireClassroom } from '@/app/_lib/services/classroom'
+import { Alert, Box, Button, Typography } from '@mui/material'
 import Link from 'next/link'
 import Enrollments from './_components/enrollments'
 
@@ -17,31 +18,43 @@ export default async function Page({ params }: {
     churchId: user.churchId
   })
 
+  if (!currentTerm) {
+    return (
+      <div>
+        <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
+          {classroom.name}
+        </Typography>
+        <Alert severity="info">Não há período aberto no momento.</Alert>
+      </div>
+    )
+  }
+
   const enrollments = await dbGetEnrollmentsByClassroomAndTerm({
-    termId: currentTerm?.id ?? 0,
+    termId: currentTerm.id,
     classroomId: classroom.id
   })
 
   return (
-    <div className="card shadow-sm">
-      <div className="card-body">
-        <h2 className="card-title">{classroom.name}</h2>
-        {currentTerm ? (
-          <>
-            <div className="badge badge-neutral badge-outline">
-              {currentTerm.termName} - {currentTerm.year}
-            </div>
-            {enrollments.length > 0 ? (
-              <Enrollments {...{ enrollments }} />
-            ) : (
-              <p>Nenhuma matrícula para o período atual</p>
-            )}
-            <Link href={`/classroom/${classroomId}/enrollments`}>Nova matrícula</Link>
-          </>
-        ) : (
-          <h2>Não há período atual</h2>
-        )}
-      </div>
-    </div>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Typography component="h1" variant="h4" sx={{ mb: 2, overflowWrap: 'anywhere' }}>
+        {classroom.name}
+      </Typography>
+
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography component="h2" variant="h6" sx={{ overflowWrap: 'anywhere' }}>
+          {currentTerm.termName} - {currentTerm.year}
+        </Typography>
+        <Link href={`/classroom/${classroomId}/enrollments`} passHref>
+          <Button
+            variant="contained"
+            color="success"
+          >
+            Nova matrícula
+          </Button>
+        </Link>
+      </Box>
+
+      <Enrollments enrollments={enrollments} />
+    </Box>
   )
 }

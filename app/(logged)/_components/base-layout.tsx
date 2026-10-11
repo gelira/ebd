@@ -78,7 +78,10 @@ export default function BaseLayout({ children, congregations, user }: {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 4,
+          minWidth: 0,
+          width: '100%',
+          boxSizing: 'border-box',
+          p: { xs: 2, sm: 4 },
           pt: 0
         }}
       >

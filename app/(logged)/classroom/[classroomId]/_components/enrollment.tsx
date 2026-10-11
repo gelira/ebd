@@ -1,6 +1,8 @@
 'use client'
 
-import { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
+import type { EnrollmentWithPerson } from '@/app/_lib/db/enrollment'
+import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
+import { Button, IconButton, TableCell, TableRow, Tooltip } from '@mui/material'
 import { useState, useTransition } from 'react'
 
 export default function Enrollment({ enrollment, deletedCallback }: {
@@ -28,6 +30,8 @@ export default function Enrollment({ enrollment, deletedCallback }: {
 
         if (data.message) {
           setMessage(data.message)
+        } else {
+          setMessage('Erro ao excluir matrícula. Tente novamente')
         }
       } catch {
         setMessage('Erro ao excluir matrícula. Tente novamente')
@@ -36,24 +40,50 @@ export default function Enrollment({ enrollment, deletedCallback }: {
   }
 
   return (
-    <div>
-      <span>{enrollment.person.completeName}</span>
-      {pending ? (
-        <p>Excluindo...</p>
-      ) : (
-        <>
-          {deletedClicked ? (
-            <div>
-              <span>Deseja mesmo excluir essa matrícula?</span>
-              <button onClick={deleteClick}>Sim</button>
-              <button onClick={() => setDeletedClicked(false)}>Não</button>
-            </div>
+    <>
+      <TableRow hover>
+        <TableCell>{enrollment.person.completeName}</TableCell>
+        <TableCell
+          align="right"
+          sx={{
+            position: 'sticky',
+            right: 0,
+            zIndex: 1,
+            backgroundColor: 'background.paper',
+          }}
+        >
+          {pending ? (
+            <span>Excluindo...</span>
+          ) : deletedClicked ? (
+            <>
+              <Button color="error" size="small" onClick={deleteClick}>
+                Excluir
+              </Button>
+              <Button size="small" onClick={() => setDeletedClicked(false)}>
+                Cancelar
+              </Button>
+            </>
           ) : (
-            <button onClick={() => setDeletedClicked(true)}>Deletar</button>
+            <Tooltip title="Excluir matrícula">
+              <IconButton
+                aria-label={`Excluir matrícula de ${enrollment.person.completeName}`}
+                color="error"
+                size="small"
+                onClick={() => setDeletedClicked(true)}
+              >
+                <DeleteOutlinedIcon />
+              </IconButton>
+            </Tooltip>
           )}
-        </>
+        </TableCell>
+      </TableRow>
+      {message && (
+        <TableRow>
+          <TableCell colSpan={2} sx={{ color: 'error.main' }}>
+            {message}
+          </TableCell>
+        </TableRow>
       )}
-      {message && <p>{message}</p>}
-    </div>
+    </>
   )
 }
