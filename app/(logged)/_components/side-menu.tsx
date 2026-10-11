@@ -1,22 +1,14 @@
-import prisma from '@/app/_lib/db/prisma'
-import { requireUser } from '@/app/_lib/services/auth'
-import { List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
-import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import type { Congregation } from '@/app/_lib/generated/prisma/client'
+import type { RequiredUser } from '@/app/_lib/services/auth'
+import { List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material'
+import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import Link from 'next/link'
 
-export default async function SideMenu() {
-  const user = await requireUser()
-
-  const congregations = await prisma.congregation.findMany({
-    where: {
-      usersCongregation: {
-        some: {
-          userId: user.id,
-        },
-      },
-    },
-  })
-
+export default function SideMenu({ congregations, user, onItemClick }: {
+  congregations: Congregation[]
+  user: RequiredUser
+  onItemClick: () => void
+}) {
   return (
     <List>
       <ListItem>
@@ -26,22 +18,18 @@ export default async function SideMenu() {
         <ListItemText primary={user.name} />
       </ListItem>
 
-      <ListItemButton>
-        <ListItemText primary="Usuários" />
-      </ListItemButton>
-
-      <ListItemButton>
-        <ListItemText primary="Produtos" />
-      </ListItemButton>
-
-      <ListItemButton>
-        <ListItemText primary="Configurações" />
-      </ListItemButton>
+      {congregations.length > 0 && (
+        <ListSubheader>Congregações</ListSubheader>
+      )}
 
       {congregations.map((congregation) => (
-        <ListItemButton key={congregation.id}>
+        <ListItemButton
+          key={congregation.id}
+          onClick={onItemClick}
+          sx={{ '& a': { color: 'inherit', textDecoration: 'none' } }}
+        >
           <Link href={`/congregation/${congregation.id}`}>
-            {congregation.name}
+            <ListItemText primary={congregation.name} />        
           </Link>
         </ListItemButton>
       ))}

@@ -3,13 +3,15 @@
 import { useState } from 'react'
 import { AppBar, Box, Drawer, IconButton, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
+import type { Congregation } from '@/app/_lib/generated/prisma/client'
 import type { RequiredUser } from '@/app/_lib/services/auth'
+import SideMenu from './side-menu'
 
 const drawerWidth = 260
 
-export default function BaseLayout({ children, menuElement, user }: {
+export default function BaseLayout({ children, congregations, user }: {
   children: React.ReactNode
-  menuElement: React.ReactNode
+  congregations: Congregation[]
   user: RequiredUser
 }) {
   const [open, setOpen] = useState(false)
@@ -65,7 +67,11 @@ export default function BaseLayout({ children, menuElement, user }: {
         }}
       >
         <Toolbar />
-        {menuElement}
+        <SideMenu
+          congregations={congregations}
+          user={user}
+          onItemClick={() => setOpen(false)}
+        />
       </Drawer>
 
       <Box
