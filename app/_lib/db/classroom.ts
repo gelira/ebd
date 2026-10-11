@@ -31,6 +31,9 @@ export async function dbGetClassroom({ id, userId }: {
         },
       ]
     },
+    include: {
+      congregation: true,
+    },
   })
 }
 
@@ -77,3 +80,5 @@ export async function dbGetClassroomsByCongregationId({ congregationId }: {
     },
   })
 }
+
+export type ClassroomWithCongregation = Awaited<ReturnType<typeof dbGetClassroom>>
