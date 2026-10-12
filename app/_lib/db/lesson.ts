@@ -1,6 +1,20 @@
 import 'server-only'
 import prisma from './prisma'
 
+export async function dbGetUncompletedLessonsByTerm({ termId }: {
+  termId: number
+}) {
+  return await prisma.lesson.findMany({
+    where: {
+      termId,
+      completed: false,
+    },
+    orderBy: {
+      lessonName: 'asc',
+    },
+  })
+}
+
 export async function dbGetLesson({ id, churchId }: {
   id: number
   churchId: number
