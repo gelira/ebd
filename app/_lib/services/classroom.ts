@@ -13,7 +13,7 @@ export async function requireClassroom({ classroomId, userId }: {
 }) {
   const parsedId = parseIntParam(classroomId)
 
-  const classroom = await getClassroom({ id: parsedId, userId })
+  const classroom = await getClassroom(parsedId, userId)
 
   if (!classroom) {
     notFound()

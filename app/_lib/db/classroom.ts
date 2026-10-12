@@ -1,10 +1,7 @@
 import 'server-only'
 import prisma from './prisma'
 
-export async function dbGetClassroom({ id, userId }: {
-  id: number
-  userId: number
-}) {
+export async function dbGetClassroom(id: number, userId: number) {
   return await prisma.classroom.findFirst({
     where: {
       AND: [

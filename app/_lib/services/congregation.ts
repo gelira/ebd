@@ -13,7 +13,7 @@ export async function requireCongregation({ congregationId, userId }: {
 }) {
   const parsedId = parseIntParam(congregationId)
 
-  const congregation = await getCongregation({ id: parsedId, userId })
+  const congregation = await getCongregation(parsedId, userId)
 
   if (!congregation) {
     notFound()

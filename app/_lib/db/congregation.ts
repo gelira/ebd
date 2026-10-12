@@ -20,10 +20,7 @@ export async function dbGetUserCongregations(userId: number) {
 
 export const dbCachedGetUserCongregations = cache(dbGetUserCongregations)
  
-export async function dbGetCongregation({ id, userId }: {
-  id: number
-  userId: number
-}) {
+export async function dbGetCongregation(id: number, userId: number) {
   return await prisma.congregation.findFirst({
     where: {
       id,
