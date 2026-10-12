@@ -1,6 +1,7 @@
 import { dbGetClassroomsByCongregationId } from '@/app/_lib/db/classroom'
 import { requireUser } from '@/app/_lib/services/auth'
 import { requireCongregation } from '@/app/_lib/services/congregation'
+import { Box, Card, CardActionArea, CardContent, Stack, Typography } from '@mui/material'
 import Link from 'next/link'
 
 export default async function Page({ params }: {
@@ -19,18 +20,32 @@ export default async function Page({ params }: {
   })
 
   return (
-    <div className="card shadow-sm">
-      <div className="card-body">
-        <h2 className="card-title">Classes - {congregation.name}</h2>
-        {classrooms?.map((classroom) => (
-          <Link
-            key={classroom.id}
-            href={`/classroom/${classroom.id}`}
-          >
-            <button className="btn btn-outline w-full">{classroom.name}</button>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
+        Classes - {congregation.name}
+      </Typography>
+
+      {classrooms.length > 0 ? (
+        <Stack spacing={2} sx={{ '& a': { textDecoration: 'none' } }}>
+          {classrooms.map((classroom) => (
+            <Link key={classroom.id} href={`/classroom/${classroom.id}`} passHref>
+              <Card>
+                <CardActionArea>
+                  <CardContent>
+                    <Typography component="h2" variant="h6">
+                      {classroom.name}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Link>
+          ))}
+        </Stack>
+      ) : (
+        <Typography color="text.secondary">
+          Esta congregação não tem classes.
+        </Typography>
+      )}
+    </Box>
   )
 }
