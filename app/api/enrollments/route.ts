@@ -46,7 +46,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const classroom = await dbGetClassroom({ id: classroomId, userId: user.id })
+    const classroom = await dbGetClassroom(classroomId, user.id)
     
     if (!classroom) {
       return NextResponse.json(

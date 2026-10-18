@@ -63,10 +63,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const classroom = await dbGetClassroom({
-      id: data.classroomId,
-      userId: user.id,
-    })
+    const classroom = await dbGetClassroom(data.classroomId, user.id)
 
     if (!classroom) {
       return NextResponse.json(
@@ -178,10 +175,7 @@ export async function PUT(request: Request) {
       )
     }
 
-    const classroom = await dbGetClassroom({
-      id: data.classroomId,
-      userId: user.id,
-    })
+    const classroom = await dbGetClassroom(data.classroomId, user.id)
 
     if (!classroom) {
       return NextResponse.json(
