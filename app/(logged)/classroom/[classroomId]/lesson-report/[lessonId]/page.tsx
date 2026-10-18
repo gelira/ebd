@@ -4,6 +4,7 @@ import { dbGetLessonReport } from '@/app/_lib/db/lesson-report'
 import { requireUser } from '@/app/_lib/services/auth'
 import { requireClassroom } from '@/app/_lib/services/classroom'
 import { requireLesson } from '@/app/_lib/services/lesson'
+import { Box, Typography } from '@mui/material'
 import RegisterLessonReport from './_components/register-lesson-report'
 
 export default async function Page({ params }: {
@@ -50,15 +51,20 @@ export default async function Page({ params }: {
   })()
 
   return (
-    <div>
-      <h2>Registro de aula</h2>
-      <h3>{lesson.lessonName} - {lesson.term.termName}/{lesson.term.year} - {classroom.name}</h3>
+    <Box sx={{ width: '100%', minWidth: 0 }}>
+      <Typography component="h1" variant="h4" sx={{ mb: 2, overflowWrap: 'anywhere' }}>
+        Registro de Aula
+      </Typography>
+      <Typography component="h2" variant="h6" sx={{ mb: 2, overflowWrap: 'anywhere' }}>
+        {classroom.name} - {lesson.lessonName} - {lesson.term.termName} - {lesson.term.year}
+      </Typography>
       <RegisterLessonReport
+        existingReport={!!lessonReport}
         enrollments={enrollments}
         classroomId={classroom.id}
         lessonId={lesson.id}
         lessonReport={lessonReport}
       />
-    </div>
+    </Box>
   )
 }
