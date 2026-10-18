@@ -21,15 +21,21 @@ export default function Attendance({
   completeName,
   attendance,
   onChange,
+  readOnly = false,
 }: {
   personId: number
   completeName: string
   attendance?: AttendanceTypeEnum
   onChange: (personId: number, attendance: AttendanceTypeEnum) => void
+  readOnly?: boolean
 }) {
   const attendanceColor = attendance && COLORS[attendance] || 'primary'
 
   const onSelectChange = (event: SelectChangeEvent<string>) => {
+    if (readOnly) {
+      return
+    }
+
     onChange(personId, event.target.value as AttendanceTypeEnum)
   }
 
@@ -62,6 +68,7 @@ export default function Attendance({
           name={`attendance-${personId}`}
           value={attendance ?? ''}
           displayEmpty
+          open={readOnly ? false : undefined}
           onChange={onSelectChange}
           required
           color={attendanceColor}

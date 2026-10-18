@@ -18,12 +18,14 @@ import Attendance from './attedance'
 
 export default function RegisterLessonReport({
   existingReport,
+  completed,
   enrollments,
   classroomId,
   lessonId,
   lessonReport,
 }: {
   existingReport: boolean
+  completed: boolean
   enrollments: {
     personId: number
     completeName: string
@@ -92,6 +94,10 @@ export default function RegisterLessonReport({
   const onSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    if (completed) {
+      return
+    }
+
     if (
       holyBiblesAmount === undefined ||
       lessonBooksAmount === undefined ||
@@ -154,10 +160,18 @@ export default function RegisterLessonReport({
             name="lessonDate"
             value={lessonDate}
             onChange={(e) => {
+              if (completed) {
+                return
+              }
+
               setErrorMessage('')
               setLessonDate(e.target.value)
             }}
-            slotProps={{ inputLabel: { shrink: true } }}
+            slotProps={{
+              input: { readOnly: completed },
+              inputLabel: { shrink: true },
+            }}
+            onClick={completed ? (event) => event.preventDefault() : undefined}
             required
             fullWidth
           />
@@ -179,6 +193,7 @@ export default function RegisterLessonReport({
                       completeName={e.completeName}
                       attendance={currentAttendance}
                       onChange={onAttendanceChange}
+                      readOnly={completed}
                     />
                   )
                 })
@@ -208,11 +223,18 @@ export default function RegisterLessonReport({
                 placeholder="0"
                 value={visitorsAmount !== undefined ? visitorsAmount : ''}
                 onChange={(e) => {
+                  if (completed) {
+                    return
+                  }
+
                   setErrorMessage('')
                   const val = e.target.value
                   setVisitorsAmount(val === '' ? undefined : parseInt(val, 10))
                 }}
-                slotProps={{ htmlInput: { min: 0 } }}
+                slotProps={{
+                  input: { readOnly: completed },
+                  htmlInput: { min: 0 },
+                }}
                 required
                 fullWidth
               />
@@ -224,11 +246,18 @@ export default function RegisterLessonReport({
                 placeholder="0"
                 value={holyBiblesAmount !== undefined ? holyBiblesAmount : ''}
                 onChange={(e) => {
+                  if (completed) {
+                    return
+                  }
+
                   setErrorMessage('')
                   const val = e.target.value
                   setHolyBiblesAmount(val === '' ? undefined : parseInt(val, 10))
                 }}
-                slotProps={{ htmlInput: { min: 0 } }}
+                slotProps={{
+                  input: { readOnly: completed },
+                  htmlInput: { min: 0 },
+                }}
                 required
                 fullWidth
               />
@@ -240,11 +269,18 @@ export default function RegisterLessonReport({
                 placeholder="0"
                 value={lessonBooksAmount !== undefined ? lessonBooksAmount : ''}
                 onChange={(e) => {
+                  if (completed) {
+                    return
+                  }
+
                   setErrorMessage('')
                   const val = e.target.value
                   setLessonBooksAmount(val === '' ? undefined : parseInt(val, 10))
                 }}
-                slotProps={{ htmlInput: { min: 0 } }}
+                slotProps={{
+                  input: { readOnly: completed },
+                  htmlInput: { min: 0 },
+                }}
                 required
                 fullWidth
               />
@@ -256,11 +292,16 @@ export default function RegisterLessonReport({
                 placeholder="0.00"
                 value={offeringTotal !== undefined ? offeringTotal : ''}
                 onChange={(e) => {
+                  if (completed) {
+                    return
+                  }
+
                   setErrorMessage('')
                   const val = e.target.value
                   setOfferingTotal(val === '' ? undefined : parseFloat(val))
                 }}
                 slotProps={{
+                  input: { readOnly: completed },
                   htmlInput: {
                     min: '0.00',
                     step: '0.01',
@@ -278,11 +319,16 @@ export default function RegisterLessonReport({
                 placeholder="0.00"
                 value={titheTotal !== undefined ? titheTotal : ''}
                 onChange={(e) => {
+                  if (completed) {
+                    return
+                  }
+
                   setErrorMessage('')
                   const val = e.target.value
                   setTitheTotal(val === '' ? undefined : parseFloat(val))
                 }}
                 slotProps={{
+                  input: { readOnly: completed },
                   htmlInput: {
                     min: '0.00',
                     step: '0.01',
@@ -297,19 +343,20 @@ export default function RegisterLessonReport({
 
           {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
 
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              disabled={pending}
-            >
-              {pending ? 'Salvando...' : 'Salvar'}
-            </Button>
-          </Box>
+          {!completed && (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 1 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                disabled={pending}
+              >
+                {pending ? 'Salvando...' : 'Salvar'}
+              </Button>
+            </Box>
+          )}
         </Stack>
       </CardContent>
     </Card>
   )
 }
-

@@ -60,6 +60,7 @@ export default async function Page({ params }: {
       </Typography>
       <RegisterLessonReport
         existingReport={!!lessonReport}
+        completed={lesson.completed}
         enrollments={enrollments}
         classroomId={classroom.id}
         lessonId={lesson.id}
