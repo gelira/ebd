@@ -7,6 +7,7 @@ import {
   Button,
   Card,
   CardContent,
+  InputAdornment,
   Paper,
   Stack,
   TextField,
@@ -50,11 +51,11 @@ export default function RegisterLessonReport({
   const [lessonBooksAmount, setLessonBooksAmount] = useState<number | undefined>(
     lessonReport?.lessonBooksAmount
   )
-  const [offeringTotal, setOfferingTotal] = useState<number | undefined>(
-    lessonReport?.offeringTotal
+  const [offeringTotal, setOfferingTotal] = useState(
+    lessonReport?.offeringTotal.toFixed(2) ?? ''
   )
-  const [titheTotal, setTitheTotal] = useState<number | undefined>(
-    lessonReport?.titheTotal
+  const [titheTotal, setTitheTotal] = useState(
+    lessonReport?.titheTotal.toFixed(2) ?? ''
   )
   const [attendances, setAttendances] = useState<{
     personId: number
@@ -102,10 +103,22 @@ export default function RegisterLessonReport({
       holyBiblesAmount === undefined ||
       lessonBooksAmount === undefined ||
       visitorsAmount === undefined ||
-      offeringTotal === undefined ||
-      titheTotal === undefined ||
+      offeringTotal === '' ||
+      titheTotal === '' ||
       !lessonDate
     ) {
+      return
+    }
+
+    const parsedOfferingTotal = Number(offeringTotal)
+    const parsedTitheTotal = Number(titheTotal)
+    if (
+      !Number.isFinite(parsedOfferingTotal) ||
+      parsedOfferingTotal < 0 ||
+      !Number.isFinite(parsedTitheTotal) ||
+      parsedTitheTotal < 0
+    ) {
+      setErrorMessage('Informe valores válidos para dízimos e ofertas')
       return
     }
 
@@ -130,8 +143,8 @@ export default function RegisterLessonReport({
           lessonBooksAmount,
           lessonDate,
           lessonId,
-          offeringTotal,
-          titheTotal,
+          offeringTotal: parsedOfferingTotal,
+          titheTotal: parsedTitheTotal,
           visitorsAmount
         })
       })
@@ -287,21 +300,29 @@ export default function RegisterLessonReport({
 
               <TextField
                 label="Ofertas"
-                type="number"
+                type="text"
                 name="offeringTotal"
                 placeholder="0.00"
-                value={offeringTotal !== undefined ? offeringTotal : ''}
+                value={offeringTotal}
                 onChange={(e) => {
                   if (completed) {
                     return
                   }
 
                   setErrorMessage('')
-                  const val = e.target.value
-                  setOfferingTotal(val === '' ? undefined : parseFloat(val))
+                  setOfferingTotal(e.target.value)
+                }}
+                onBlur={() => {
+                  const amount = Number(offeringTotal)
+                  if (offeringTotal !== '' && Number.isFinite(amount)) {
+                    setOfferingTotal(amount.toFixed(2))
+                  }
                 }}
                 slotProps={{
-                  input: { readOnly: completed },
+                  input: {
+                    readOnly: completed,
+                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                  },
                   htmlInput: {
                     min: '0.00',
                     step: '0.01',
@@ -314,21 +335,29 @@ export default function RegisterLessonReport({
 
               <TextField
                 label="Dízimos"
-                type="number"
+                type="text"
                 name="titheTotal"
                 placeholder="0.00"
-                value={titheTotal !== undefined ? titheTotal : ''}
+                value={titheTotal}
                 onChange={(e) => {
                   if (completed) {
                     return
                   }
 
                   setErrorMessage('')
-                  const val = e.target.value
-                  setTitheTotal(val === '' ? undefined : parseFloat(val))
+                  setTitheTotal(e.target.value)
+                }}
+                onBlur={() => {
+                  const amount = Number(titheTotal)
+                  if (titheTotal !== '' && Number.isFinite(amount)) {
+                    setTitheTotal(amount.toFixed(2))
+                  }
                 }}
                 slotProps={{
-                  input: { readOnly: completed },
+                  input: {
+                    readOnly: completed,
+                    startAdornment: <InputAdornment position="start">R$</InputAdornment>,
+                  },
                   htmlInput: {
                     min: '0.00',
                     step: '0.01',

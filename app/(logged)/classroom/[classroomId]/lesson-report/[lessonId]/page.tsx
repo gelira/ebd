@@ -56,7 +56,10 @@ export default async function Page({ params }: {
         Registro de Aula
       </Typography>
       <Typography component="h2" variant="h6" sx={{ mb: 2, overflowWrap: 'anywhere' }}>
-        {classroom.name} - {lesson.lessonName} - {lesson.term.termName} - {lesson.term.year}
+        {classroom.name} - {lesson.lessonName} {lesson.completed ? '(Concluída)' : ''}
+      </Typography>
+      <Typography component="h2" variant="h6" sx={{ mb: 2, overflowWrap: 'anywhere' }}>
+        {lesson.term.termName} - {lesson.term.year}
       </Typography>
       <RegisterLessonReport
         existingReport={!!lessonReport}

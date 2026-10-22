@@ -16,7 +16,7 @@ import {
 
 export default function LessonReportDialog({ classroomId, lessons }: {
   classroomId: number
-  lessons: { id: number, lessonName: string }[]
+  lessons: { id: number, lessonName: string, expectedDate: Date }[]
 }) {
   const [open, setOpen] = useState(false)
   const [lessonId, setLessonId] = useState('')
@@ -54,7 +54,7 @@ export default function LessonReportDialog({ classroomId, lessons }: {
               >
                 {lessons.map((lesson) => (
                   <MenuItem key={lesson.id} value={String(lesson.id)}>
-                    {lesson.lessonName}
+                    {lesson.lessonName} - {String(lesson.expectedDate.getDate()).padStart(2, '0')}/{String(lesson.expectedDate.getMonth() + 1).padStart(2, '0')}/{lesson.expectedDate.getFullYear()}
                   </MenuItem>
                 ))}
               </Select>
