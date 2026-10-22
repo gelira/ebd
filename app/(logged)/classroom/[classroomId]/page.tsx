@@ -1,5 +1,5 @@
 import { dbGetEnrollmentsByClassroomAndTerm } from '@/app/_lib/db/enrollment'
-import { dbGetUncompletedLessonsByTerm } from '@/app/_lib/db/lesson'
+import { dbGetLessonsByTerm } from '@/app/_lib/db/lesson'
 import { dbGetCurrentTerm } from '@/app/_lib/db/term'
 import { requireUser } from '@/app/_lib/services/auth'
 import { requireClassroom } from '@/app/_lib/services/classroom'
@@ -36,7 +36,7 @@ export default async function Page({ params }: {
     classroomId: classroom.id
   })
 
-  const lessons = await dbGetUncompletedLessonsByTerm({
+  const lessons = await dbGetLessonsByTerm({
     termId: currentTerm.id,
   })
 

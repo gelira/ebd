@@ -1,13 +1,12 @@
 import 'server-only'
 import prisma from './prisma'
 
-export async function dbGetUncompletedLessonsByTerm({ termId }: {
+export async function dbGetLessonsByTerm({ termId }: {
   termId: number
 }) {
   return await prisma.lesson.findMany({
     where: {
       termId,
-      completed: false,
     },
     orderBy: {
       lessonName: 'asc',
