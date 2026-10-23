@@ -14,3 +14,20 @@ export async function dbGetLessonReport({ classroomId, lessonId }: {
     },
   })
 }
+
+export async function dbGetLessonReportsByLesson({ lessonId }: {
+  lessonId: number
+}) {
+  return await prisma.lessonReport.findMany({
+    where: {
+      lessonId,
+    },
+    include: {
+      classroom: true,
+      attendances: true,
+    },
+  })
+}
+
+export type LessonReportsByLesson = Awaited<ReturnType<typeof dbGetLessonReportsByLesson>>
+

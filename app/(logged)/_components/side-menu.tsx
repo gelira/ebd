@@ -3,6 +3,7 @@ import type { RequiredUser } from '@/app/_lib/services/auth'
 import { Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, ListSubheader } from '@mui/material'
 import AccountBoxIcon from '@mui/icons-material/AccountBox'
 import PeopleIcon from '@mui/icons-material/People'
+import AssessmentIcon from '@mui/icons-material/Assessment'
 import Link from 'next/link'
 
 export default function SideMenu({ congregations, user, onItemClick }: {
@@ -44,6 +45,13 @@ export default function SideMenu({ congregations, user, onItemClick }: {
           <PeopleIcon />
         </ListItemIcon>
         <ListItemText primary="Pessoas" />
+      </ListItemButton>
+
+      <ListItemButton component={Link} href="/reports" onClick={onItemClick}>
+        <ListItemIcon>
+          <AssessmentIcon />
+        </ListItemIcon>
+        <ListItemText primary="Relatórios" />
       </ListItemButton>
     </List>
   )
